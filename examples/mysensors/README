@@ -1,0 +1,4 @@
+# ValloxSensor
+A simple arduino sketch to show how the library can be used.
+Requires the ClickButton library if you want to use the enhanced boost switch.
+
