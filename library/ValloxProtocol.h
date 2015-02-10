@@ -1,6 +1,12 @@
-// (c) windkh 2015
-// Static functions and definitions of the vallox protocol
-// 
+// ---------------------------------------------------------------------------
+// Vallox serial protocol definitions - v1.0 - 10.2.2015
+//
+// AUTHOR/LICENSE:
+// Created by Karl-Heinz Wind - karl-heinz.wind@web.de
+// Copyright 2015 License: GNU GPL v3 http://www.gnu.org/licenses/gpl-3.0.html
+// ---------------------------------------------------------------------------
+
+// Protocol:
 // 01 21 11 00 A3 C9
 // |  |  |  |  |  |
 // |  |  |  |  |  CRC
