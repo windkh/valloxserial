@@ -1,11 +1,3 @@
-// ---------------------------------------------------------------------------
-// Vallox serial - v1.0 - 10.2.2015
-//
-// AUTHOR/LICENSE:
-// Created by Karl-Heinz Wind - karl-heinz.wind@web.de
-// Copyright 2015 License: GNU GPL v3 http://www.gnu.org/licenses/gpl-3.0.html
-// ---------------------------------------------------------------------------
-
 #ifndef ValloxSerial_h
 #define ValloxSerial_h
 
@@ -70,12 +62,19 @@ extern "C" {
 		MaxSpeedLimitModeProperty		= 35,
 
 		ServiceReminderProperty			= 36,
+
+		
 #endif
 		// calculated  properties
 		InEfficiencyProperty			= 100,
 		OutEfficiencyProperty			= 101,
 		AverageEfficiencyProperty		= 102,
 		
+		// TODO
+		// Volumenstrom
+		// Wärmeübertragung
+		// Wärmegewinn
+
 		// virtual properties to be able to poll for this variable
 		SelectStatusProperty			= 200,
 		ProgramProperty					= 201,

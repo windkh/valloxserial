@@ -1,11 +1,3 @@
-// ---------------------------------------------------------------------------
-// Vallox serial - v1.0 - 10.2.2015
-//
-// AUTHOR/LICENSE:
-// Created by Karl-Heinz Wind - karl-heinz.wind@web.de
-// Copyright 2015 License: GNU GPL v3 http://www.gnu.org/licenses/gpl-3.0.html
-// ---------------------------------------------------------------------------
-
 #include <ValloxSerial.h>
 
 const int8_t INITIAL_VALUE = -1;
@@ -582,6 +574,103 @@ bool ValloxSerial::onTelegramReceived(uint8_t sender, uint8_t receiver, uint8_t 
 
 		switch (variable)
 		{
+		case VALLOX_VARIABLE_IOPORT_FANSPEED_RELAYS:
+		{
+			// TODO
+			// convertIoPortFanSpeedRelays
+			break;
+		}
+		case VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_1:
+		{
+			// convertIoPortMultiPurpose1
+			break;
+		}
+		case VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2:
+		{
+			// TODO
+			// convertIoPortMultiPurpose2
+			break;
+		}
+		case VALLOX_VARIABLE_INSTALLED_CO2_SENSORS:
+		{
+			// TODO
+			// convertInstalledCO2Sensor
+			break;
+		}
+		case VALLOX_VARIABLE_CURRENT_INCOMMING:
+		{
+			// TODO
+			break;
+		}
+		case VALLOX_VARIABLE_LAST_ERROR_NUMBER:
+		{
+			// TODO
+			break;
+		}
+		case VALLOX_VARIABLE_POST_HEATING_ON_COUNTER:
+		{
+			// TODO
+			break;
+		}
+		case VALLOX_VARIABLE_POST_HEATING_OFF_TIME:
+		{
+			// TODO
+			break;
+		}
+		case VALLOX_VARIABLE_POST_HEATING_TARGET_VALUE:
+		{
+			// TODO
+			break;
+		}
+		case VALLOX_VARIABLE_FLAGS_1:
+		{
+			// TODO
+			// converFlags1
+			break;
+		}
+		case VALLOX_VARIABLE_FLAGS_2:
+		{
+			// TODO
+			// converFlags2
+			break;
+		}
+		case VALLOX_VARIABLE_FLAGS_3:
+		{
+			// TODO
+			// converFlags3
+			break;
+		}
+		case VALLOX_VARIABLE_FLAGS_4:
+		{
+			// TODO
+			// converFlags4
+			break;
+		}
+		case VALLOX_VARIABLE_FLAGS_5:
+		{
+			// TODO
+			// converFlags5
+			break;
+		}
+		case VALLOX_VARIABLE_FLAGS_6:
+		{
+			// TODO
+			// converFlags6
+			break;
+		}
+		case VALLOX_VARIABLE_FIRE_PLACE_BOOSTER_COUNTER:
+		{
+			// TODO
+			break;
+		}
+		case VALLOX_VARIABLE_MAINTENANCE_MONTH_COUNTER:
+		{
+			// TODO
+			break;
+		}
+		
+
+
 		case VALLOX_VARIABLE_FAN_SPEED:
 		{
 			int fanSpeed = Vallox::convertFanSpeed(value);

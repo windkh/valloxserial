@@ -1,12 +1,5 @@
-// ---------------------------------------------------------------------------
-// Vallox serial protocol definitions - v1.0 - 10.2.2015
-//
-// AUTHOR/LICENSE:
-// Created by Karl-Heinz Wind - karl-heinz.wind@web.de
-// Copyright 2015 License: GNU GPL v3 http://www.gnu.org/licenses/gpl-3.0.html
-// ---------------------------------------------------------------------------
-
-// Protocol:
+﻿// Static functions and definitions of the vallox protocol
+// 
 // 01 21 11 00 A3 C9
 // |  |  |  |  |  |
 // |  |  |  |  |  CRC
@@ -55,10 +48,70 @@ const uint8_t VALLOX_ADDRESS_PANEL8 = VALLOX_ADDRESS_PANELS + 9;
 // Variables 
 const uint8_t VALLOX_VARIABLE_POLL = 0x00;		// poll request for variable in value.
 
+// 1 1 1 1 1 1 1 1  
+// | | | | | | | |
+// | | | | | | | +- 0 Speed 1 - 0=0ff 1=on - readonly
+// | | | | | | +--- 1 Speed 2 - 0=0ff 1=on - readonly
+// | | | | | +----- 2 Speed 3 - 0=0ff 1=on - readonly
+// | | | | +------- 3 Speed 4 - 0=0ff 1=on - readonly
+// | | | +--------- 4 Speed 5 - 0=0ff 1=on - readonly
+// | | +----------- 5 Speed 6 - 0=0ff 1=on - readonly
+// | +------------- 6 Speed 7 - 0=0ff 1=on - readonly
+// +--------------- 7 Speed 8 - 0=0ff 1=on - readonly
+const uint8_t VALLOX_VARIABLE_IOPORT_FANSPEED_RELAYS = 0x06;
+
+// 1 1 1 1 1 1 1 1 
+// | | | | | | | |
+// | | | | | | | +- 0 
+// | | | | | | +--- 1 
+// | | | | | +----- 2 
+// | | | | +------- 3 
+// | | | +--------- 4 
+// | | +----------- 5  post-heating on - 0=0ff 1=on - readonly
+// | +------------- 6 
+// +--------------- 7 
+const uint8_t VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_1 = 0x07;
+
+// 1 1 1 1 1 1 1 1  0=0ff 1=on
+// | | | | | | | |
+// | | | | | | | +- 0 
+// | | | | | | +--- 1 damper motor position - 0=winter 1=season - readonly
+// | | | | | +----- 2 fault signal relay - 0=open 1=closed - readonly
+// | | | | +------- 3 supply fan - 0=on 1=off
+// | | | +--------- 4 pre-heating - 0=off 1=on - readonly
+// | | +----------- 5 exhaust-fan - 0=on 1=off
+// | +------------- 6 fireplace-booster - 0=open 1=closed - readonly 
+// +--------------- 7 
+const uint8_t VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2 = 0x08;
+
+//01H = speed 1
+//03H = speed 2
+//07H = speed 3
+//0FH = speed 4
+//1FH = speed 5
+//3FH = speed 6
+//7FH = speed 7
+//FFH = speed 8
 const uint8_t VALLOX_VARIABLE_FAN_SPEED = 0x29;
+
+// 33H = 0% FFH = 100%
 const uint8_t VALLOX_VARIABLE_HUMIDITY = 0x2A; // higher measured relative humidity from 2F and 30. Translating Formula (x-51)/2.04
 const uint8_t VALLOX_VARIABLE_CO2_HIGH = 0x2B;
 const uint8_t VALLOX_VARIABLE_CO2_LOW = 0x2C;
+
+// 1 1 1 1 1 1 1 1 
+// | | | | | | | |
+// | | | | | | | +- 0 
+// | | | | | | +--- 1 Sensor1 - 0=not installed 1=installed - readonly
+// | | | | | +----- 2 Sensor2 - 0=not installed 1=installed - readonly
+// | | | | +------- 3 Sensor3 - 0=not installed 1=installed - readonly
+// | | | +--------- 4 Sensor4 - 0=not installed 1=installed - readonly
+// | | +----------- 5 Sensor5 - 0=not installed 1=installed - readonly
+// | +------------- 6 
+// +--------------- 7 
+const uint8_t VALLOX_VARIABLE_INSTALLED_CO2_SENSORS = 0x2D;
+
+const uint8_t VALLOX_VARIABLE_CURRENT_INCOMMING = 0x2E; // Current/Voltage in mA incomming on machine - readonly
 
 const uint8_t VALLOX_VARIABLE_HUMIDITY_SENSOR1 = 0x2F; // sensor value: (x-51)/2.04
 const uint8_t VALLOX_VARIABLE_HUMIDITY_SENSOR2 = 0x30; // sensor value: (x-51)/2.04
@@ -68,9 +121,97 @@ const uint8_t VALLOX_VARIABLE_TEMP_EXHAUST = 0x33;
 const uint8_t VALLOX_VARIABLE_TEMP_INSIDE = 0x34;
 const uint8_t VALLOX_VARIABLE_TEMP_INCOMMING = 0x35;
 
+//05H = Supply air temperature sensor fault
+//06H = Carbon dioxide alarm
+//07h = Outdoor air sensor fault
+//08H = Extract air sensor fault
+//09h = Water radiator danger of freezing
+//0AH = Exhaust air sensor fault
+const uint8_t VALLOX_VARIABLE_LAST_ERROR_NUMBER = 0x36;
 
-// This variable is cyclically polled from Panel1 but not described in the protocol
-const uint8_t VALLOX_VARIABLE_UNKNOWN = 0x71;
+//Post-heating power-on seconds counter. Percentage of X / 2.5
+const uint8_t VALLOX_VARIABLE_POST_HEATING_ON_COUNTER = 0x55;
+
+//Post-heating off time, in seconds, the counter. Percentage of X / 2.5
+const uint8_t VALLOX_VARIABLE_POST_HEATING_OFF_TIME = 0x56;
+
+//The ventilation zone of air blown to the desired temperature NTC sensor scale
+const uint8_t VALLOX_VARIABLE_POST_HEATING_TARGET_VALUE = 0x57;
+
+// 1 1 1 1 1 1 1 1 
+// | | | | | | | |
+// | | | | | | | +- 0 
+// | | | | | | +--- 1 
+// | | | | | +----- 2 
+// | | | | +------- 3 
+// | | | +--------- 4 
+// | | +----------- 5 
+// | +------------- 6 
+// +--------------- 7 
+const uint8_t VALLOX_VARIABLE_FLAGS_1 = 0x6C;
+
+// 1 1 1 1 1 1 1 1 
+// | | | | | | | |
+// | | | | | | | +- 0 CO2 higher speed-request 0=no 1=Speed​​. up
+// | | | | | | +--- 1 CO2 lower rate public invitation 0=no 1=Speed​​. down
+// | | | | | +----- 2 %RH lower rate public invitation 0=no 1=Speed​​. down
+// | | | | +------- 3 switch low. Spd.-request 0=no 1=Speed ​. down
+// | | | +--------- 4 
+// | | +----------- 5 
+// | +------------- 6 CO2 alarm 0=no 1=CO2 alarm
+// +--------------- 7 sensor Frost alarm 0=no 1=a risk of freezing
+const uint8_t VALLOX_VARIABLE_FLAGS_2 = 0x6D;
+
+// 1 1 1 1 1 1 1 1 
+// | | | | | | | |
+// | | | | | | | +- 0 
+// | | | | | | +--- 1 
+// | | | | | +----- 2 
+// | | | | +------- 3 
+// | | | +--------- 4 
+// | | +----------- 5 
+// | +------------- 6 
+// +--------------- 7 
+const uint8_t VALLOX_VARIABLE_FLAGS_3 = 0x6E;
+
+// 1 1 1 1 1 1 1 1 
+// | | | | | | | |
+// | | | | | | | +- 0 
+// | | | | | | +--- 1 
+// | | | | | +----- 2 
+// | | | | +------- 3 
+// | | | +--------- 4 water radiator danger of freezing 0=no risk 1 = risk
+// | | +----------- 5 
+// | +------------- 6 
+// +--------------- 7 slave/master selection 0=slave 1=master
+const uint8_t VALLOX_VARIABLE_FLAGS_4 = 0x6F;
+
+// 1 1 1 1 1 1 1 1 
+// | | | | | | | |
+// | | | | | | | +- 0 
+// | | | | | | +--- 1 
+// | | | | | +----- 2 
+// | | | | +------- 3 
+// | | | +--------- 4 
+// | | +----------- 5 
+// | +------------- 6 
+// +--------------- 7 preheating status flag 0=on 1=off
+const uint8_t VALLOX_VARIABLE_FLAGS_5 = 0x70;
+
+// 1 1 1 1 1 1 1 1 
+// | | | | | | | |
+// | | | | | | | +- 0 
+// | | | | | | +--- 1 
+// | | | | | +----- 2 
+// | | | | +------- 3 
+// | | | +--------- 4 remote monitoring control 0=no 1=Operation - readonly
+// | | +----------- 5 Activation of the fireplace switch read the variable and set this number one
+// | +------------- 6 fireplace/booster status 0=off 1=on - read only
+// +--------------- 7
+const uint8_t VALLOX_VARIABLE_FLAGS_6 = 0x71;
+
+//Function time in minutes remaining , descending - readonly
+const uint8_t VALLOX_VARIABLE_FIRE_PLACE_BOOSTER_COUNTER = 0x79;
 
 // Suspend Resume Traffic for CO2 sensor interaction: is sent twice as broadcast
 const uint8_t VALLOX_VARIABLE_SUSPEND = 0x91;
@@ -88,10 +229,29 @@ const uint8_t VALLOX_VARIABLE_RESUME = 0x8F;
 // +--------------- 7 service reminder
 const uint8_t VALLOX_VARIABLE_SELECT = 0xA3;
 const uint8_t VALLOX_VARIABLE_HEATING_SET_POINT = 0xA4;
+
+
+//01H = Speed 1
+//03H = Speed 2
+//07H = Speed 3
+//0FH = Speed 4
+//1FH = Speed 5
+//3FH = Speed 6
+//7FH = Speed 7
+//FFH = Speed 8
 const uint8_t VALLOX_VARIABLE_FAN_SPEED_MAX = 0xA5;
-const uint8_t VALLOX_VARIABLE_SERVICE_REMINDER = 0xA6;
+const uint8_t VALLOX_VARIABLE_SERVICE_REMINDER = 0xA6; // months
 const uint8_t VALLOX_VARIABLE_PRE_HEATING_SET_POINT = 0xA7;
 const uint8_t VALLOX_VARIABLE_INPUT_FAN_STOP = 0xA8;  // Temp threshold: fan stops if input temp falls below this temp.
+
+//01H = Speed 1
+//03H = Speed 2
+//07H = Speed 3
+//0FH = Speed 4
+//1FH = Speed 5
+//3FH = Speed 6
+//7FH = Speed 7
+//FFH = Speed 8
 const uint8_t VALLOX_VARIABLE_FAN_SPEED_MIN = 0xA9;
 
 // 1 1 1 1 1 1 1 1
@@ -106,6 +266,9 @@ const uint8_t VALLOX_VARIABLE_FAN_SPEED_MIN = 0xA9;
 // | +------------- 6 radiator type 0 = electric, 1 = water
 // +--------------- 7 cascade adjust 0 = off, 1 = on
 const uint8_t VALLOX_VARIABLE_PROGRAM = 0xAA;
+
+//The maintenance counter informs about the next maintenance alarm time: remaining months, descending.
+const uint8_t VALLOX_VARIABLE_MAINTENANCE_MONTH_COUNTER = 0xAB;
 
 const uint8_t VALLOX_VARIABLE_BASIC_HUMIDITY_LEVEL = 0xAE;
 const uint8_t VALLOX_VARIABLE_HRC_BYPASS = 0xAF; // Heat recovery cell bypass setpoint temp 
@@ -128,7 +291,7 @@ const uint8_t VALLOX_VARIABLE_CO2_SET_POINT_LOWER = 0xB4;
 const uint8_t VALLOX_VARIABLE_PROGRAM2 = 0xB5;
 
 // This one is queried at startup and answered with 3 but not described in the protocol
-const uint8_t VALLOX_VARIABLE_UNKNOWN2 = 0xC0;
+const uint8_t VALLOX_VARIABLE_UNKNOWN = 0xC0;
 
 // see VALLOX_VARIABLE_PROGRAM2
 enum ValloxMaxSpeedLimitMode
@@ -311,6 +474,295 @@ public:
 		bool* pMaxSpeeLimitMode)
 	{
 		*pMaxSpeeLimitMode = (program & 0x01) != 0;
+	}
+
+	// 1 1 1 1 1 1 1 1  
+	// | | | | | | | |
+	// | | | | | | | +- 0 Speed 1 - 0=0ff 1=on - readonly
+	// | | | | | | +--- 1 Speed 2 - 0=0ff 1=on - readonly
+	// | | | | | +----- 2 Speed 3 - 0=0ff 1=on - readonly
+	// | | | | +------- 3 Speed 4 - 0=0ff 1=on - readonly
+	// | | | +--------- 4 Speed 5 - 0=0ff 1=on - readonly
+	// | | +----------- 5 Speed 6 - 0=0ff 1=on - readonly
+	// | +------------- 6 Speed 7 - 0=0ff 1=on - readonly
+	// +--------------- 7 Speed 8 - 0=0ff 1=on - readonly
+	static void convertIoPortFanSpeedRelays(uint8_t value,
+		bool* pSpeed1,
+		bool* pSpeed2,
+		bool* pSpeed3,
+		bool* pSpeed4,
+		bool* pSpeed5,
+		bool* pSpeed6,
+		bool* pSpeed7,
+		bool* pSpeed8)
+	{
+		*pSpeed1 = (value & 0x01) != 0;
+		*pSpeed2 = (value & 0x02) != 0;
+		*pSpeed3 = (value & 0x04) != 0;
+		*pSpeed4 = (value & 0x08) != 0;
+		*pSpeed5 = (value & 0x10) != 0;
+		*pSpeed6 = (value & 0x20) != 0;
+		*pSpeed7 = (value & 0x40) != 0;
+		*pSpeed8 = (value & 0x80) != 0;
+	}
+
+	// 1 1 1 1 1 1 1 1 
+	// | | | | | | | |
+	// | | | | | | | +- 0 
+	// | | | | | | +--- 1 
+	// | | | | | +----- 2 
+	// | | | | +------- 3 
+	// | | | +--------- 4 
+	// | | +----------- 5  post-heating on - 0=0ff 1=on - readonly
+	// | +------------- 6 
+	// +--------------- 7 
+	static void convertIoPortMultiPurpose1(uint8_t value,
+		bool* pPreHeatingOn)
+	{
+		*pPreHeatingOn = (value & 0x20) != 0;
+	}
+
+	// 1 1 1 1 1 1 1 1  0=0ff 1=on
+	// | | | | | | | |
+	// | | | | | | | +- 0 
+	// | | | | | | +--- 1 damper motor position - 0=winter 1=season - readonly
+	// | | | | | +----- 2 fault signal relay - 0=open 1=closed - readonly
+	// | | | | +------- 3 supply fan - 0=on 1=off
+	// | | | +--------- 4 pre-heating - 0=off 1=on - readonly
+	// | | +----------- 5 exhaust-fan - 0=on 1=off
+	// | +------------- 6 fireplace-booster - 0=open 1=closed - readonly 
+	// +--------------- 7 
+	static void convertIoPortMultiPurpose2(uint8_t value,
+		//bool* pUnknown1,
+		bool* pDamperMotorPosition,
+		bool* pFaultSignalRelay,
+		bool* pSupplyFan,
+		bool* pPreHeating,
+		bool* pExhaustFan,
+		bool* pFireplaceBooster
+		//bool* pUnknown2
+		)
+	{
+		//*pUnknown1 = (value & 0x01) != 0;
+		*pDamperMotorPosition = (value & 0x02) != 0;
+		*pFaultSignalRelay = (value & 0x04) != 0;
+		*pSupplyFan = (value & 0x08) != 0;
+		*pPreHeating = (value & 0x10) != 0;
+		*pExhaustFan = (value & 0x20) != 0;
+		*pFireplaceBooster = (value & 0x40) != 0;
+		//*pUnknown2 = (value & 0x80) != 0;
+	}
+
+	// 1 1 1 1 1 1 1 1 
+	// | | | | | | | |
+	// | | | | | | | +- 0 
+	// | | | | | | +--- 1 Sensor1 - 0=not installed 1=installed - readonly
+	// | | | | | +----- 2 Sensor2 - 0=not installed 1=installed - readonly
+	// | | | | +------- 3 Sensor3 - 0=not installed 1=installed - readonly
+	// | | | +--------- 4 Sensor4 - 0=not installed 1=installed - readonly
+	// | | +----------- 5 Sensor5 - 0=not installed 1=installed - readonly
+	// | +------------- 6 
+	// +--------------- 7 
+	static void convertInstalledCO2Sensor(uint8_t value,
+		//bool* pUnknown1,
+		bool* pSensor1,
+		bool* pSensor2,
+		bool* pSensor3,
+		bool* pSensor4,
+		bool* pSensor5
+		//bool* pUnknown2,
+		//bool* pUnknown3
+		)
+	{
+		//*pUnknown1 = (value & 0x01) != 0;
+		*pSensor1 = (value & 0x02) != 0;
+		*pSensor2 = (value & 0x04) != 0;
+		*pSensor3 = (value & 0x08) != 0;
+		*pSensor4 = (value & 0x10) != 0;
+		*pSensor5 = (value & 0x20) != 0;
+		//*pUnknown2 = (value & 0x40) != 0;
+		//*pUnknown3 = (value & 0x80) != 0;
+	}
+
+	//// 1 1 1 1 1 1 1 1 
+	//// | | | | | | | |
+	//// | | | | | | | +- 0 
+	//// | | | | | | +--- 1 
+	//// | | | | | +----- 2 
+	//// | | | | +------- 3 
+	//// | | | +--------- 4 
+	//// | | +----------- 5 
+	//// | +------------- 6 
+	//// +--------------- 7 
+	//static void converFlags1(uint8_t value,
+	//	bool* pUnknown1,
+	//	bool* pUnknown2,
+	//	bool* pUnknown3,
+	//	bool* pUnknown4,
+	//	bool* pUnknown5,
+	//	bool* pUnknown6,
+	//	bool* pUnknown7,
+	//	bool* pUnknown8)
+	//{
+	//	*pUnknown1 = (value & 0x01) != 0;
+	//	*pUnknown2 = (value & 0x02) != 0;
+	//	*pUnknown3 = (value & 0x04) != 0;
+	//	*pUnknown4 = (value & 0x08) != 0;
+	//	*pUnknown5 = (value & 0x10) != 0;
+	//	*pUnknown6 = (value & 0x20) != 0;
+	//	*pUnknown7 = (value & 0x40) != 0;
+	//	*pUnknown8 = (value & 0x80) != 0;
+	//}
+
+	// 1 1 1 1 1 1 1 1 
+	// | | | | | | | |
+	// | | | | | | | +- 0 CO2 higher speed-request 0=no 1=Speed​​. up
+	// | | | | | | +--- 1 CO2 lower  0=no 1=Speed​​. down
+	// | | | | | +----- 2 %RH lower  0=no 1=Speed​​. down
+	// | | | | +------- 3 switch low speed-request 0=no 1=Speed ​. down
+	// | | | +--------- 4 
+	// | | +----------- 5 
+	// | +------------- 6 CO2 alarm 0=no 1=CO2 alarm
+	// +--------------- 7 Sensor frost alarm 0=no 1=a risk of freezing
+	static void converFlags2(uint8_t value,
+		bool* pCO2Higher,
+		bool* pCO2Lower,
+		bool* pHumidity,
+		bool* pSwitch,
+		//bool* pUnknown5,
+		//bool* pUnknown6,
+		bool* pCO2Alarm,
+		bool* pFrostAlarm)
+	{
+		*pCO2Higher = (value & 0x01) != 0;
+		*pCO2Lower = (value & 0x02) != 0;
+		*pHumidity = (value & 0x04) != 0;
+		*pSwitch = (value & 0x08) != 0;
+		//*pUnknown5 = (value & 0x10) != 0;
+		//*pUnknown6 = (value & 0x20) != 0;
+		*pCO2Alarm = (value & 0x40) != 0;
+		*pFrostAlarm = (value & 0x80) != 0;
+	}
+
+	//// 1 1 1 1 1 1 1 1 
+	//// | | | | | | | |
+	//// | | | | | | | +- 0 
+	//// | | | | | | +--- 1 
+	//// | | | | | +----- 2 
+	//// | | | | +------- 3 
+	//// | | | +--------- 4 
+	//// | | +----------- 5 
+	//// | +------------- 6 
+	//// +--------------- 7 
+	//static void converFlags3(uint8_t value,
+	//	bool* pUnknown1,
+	//	bool* pUnknown2,
+	//	bool* pUnknown3,
+	//	bool* pUnknown4,
+	//	bool* pUnknown5,
+	//	bool* pUnknown6,
+	//	bool* pUnknown7,
+	//	bool* pUnknown8)
+	//{
+	//	*pUnknown1 = (value & 0x01) != 0;
+	//	*pUnknown2 = (value & 0x02) != 0;
+	//	*pUnknown3 = (value & 0x04) != 0;
+	//	*pUnknown4 = (value & 0x08) != 0;
+	//	*pUnknown5 = (value & 0x10) != 0;
+	//	*pUnknown6 = (value & 0x20) != 0;
+	//	*pUnknown7 = (value & 0x40) != 0;
+	//	*pUnknown8 = (value & 0x80) != 0;
+	//}
+
+	// 1 1 1 1 1 1 1 1 
+	// | | | | | | | |
+	// | | | | | | | +- 0 
+	// | | | | | | +--- 1 
+	// | | | | | +----- 2 
+	// | | | | +------- 3 
+	// | | | +--------- 4 water radiator danger of freezing 0=no risk 1 = risk
+	// | | +----------- 5 
+	// | +------------- 6 
+	// +--------------- 7 slave/master selection 0=slave 1=master
+	static void converFlags4(uint8_t value,
+		//bool* pUnknown1,
+		//bool* pUnknown2,
+		//bool* pUnknown3,
+		//bool* pUnknown4,
+		bool* pFrostAlarmWaterRadiator,
+		//bool* pUnknown6,
+		//bool* pUnknown7,
+		bool* pSlaveMasterSelection)
+	{
+		//*pUnknown1 = (value & 0x01) != 0;
+		//*pUnknown2 = (value & 0x02) != 0;
+		//*pUnknown3 = (value & 0x04) != 0;
+		//*pUnknown4 = (value & 0x08) != 0;
+		*pFrostAlarmWaterRadiator = (value & 0x10) != 0;
+		//*pUnknown6 = (value & 0x20) != 0;
+		//*pUnknown7 = (value & 0x40) != 0;
+		*pSlaveMasterSelection = (value & 0x80) != 0;
+	}
+
+	// 1 1 1 1 1 1 1 1 
+	// | | | | | | | |
+	// | | | | | | | +- 0 
+	// | | | | | | +--- 1 
+	// | | | | | +----- 2 
+	// | | | | +------- 3 
+	// | | | +--------- 4 
+	// | | +----------- 5 
+	// | +------------- 6 
+	// +--------------- 7 slave/master selection 0=slave 1=master
+	static void converFlags5(uint8_t value,
+		//bool* pUnknown1,
+		//bool* pUnknown2,
+		//bool* pUnknown3,
+		//bool* pUnknown4,
+		//bool* pUnknown5,
+		//bool* pUnknown6,
+		//bool* pUnknown7,
+		bool* pPreHeatingStatus)
+	{
+		//*pUnknown1 = (value & 0x01) != 0;
+		//*pUnknown2 = (value & 0x02) != 0;
+		//*pUnknown3 = (value & 0x04) != 0;
+		//*pUnknown4 = (value & 0x08) != 0;
+		//*pUnknown5 = (value & 0x10) != 0;
+		//*pUnknown6 = (value & 0x20) != 0;
+		//*pUnknown7 = (value & 0x40) != 0;
+		*pPreHeatingStatus = (value & 0x80) != 0;
+	}
+
+	// 1 1 1 1 1 1 1 1 
+	// | | | | | | | |
+	// | | | | | | | +- 0 
+	// | | | | | | +--- 1 
+	// | | | | | +----- 2 
+	// | | | | +------- 3 
+	// | | | +--------- 4 remote monitoring control 0=no 1=Operation - readonly
+	// | | +----------- 5 Activation of the fireplace switch read the variable and set this number one
+	// | +------------- 6 fireplace/booster status 0=off 1=on - read only
+	// +--------------- 7
+	static void converFlags6(uint8_t value,
+		//bool* pUnknown1,
+		//bool* pUnknown2,
+		//bool* pUnknown3,
+		bool* pRemoteMonitoringControl,
+		bool* pFirePlaceSwitchActivator,
+		bool* pFirePlaceBoosterStatus
+		//bool* pUnknown7,
+		//bool* pUnknown8
+		)
+	{
+		//*pUnknown1 = (value & 0x01) != 0;
+		//*pUnknown2 = (value & 0x02) != 0;
+		//*pUnknown3 = (value & 0x04) != 0;
+		*pRemoteMonitoringControl = (value & 0x08) != 0;
+		*pFirePlaceSwitchActivator = (value & 0x10) != 0;
+		*pFirePlaceBoosterStatus = (value & 0x20) != 0;
+		//*pUnknown7 = (value & 0x40) != 0;
+		//*pUnknown8 = (value & 0x80) != 0;
 	}
 };
 
