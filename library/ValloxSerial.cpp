@@ -34,7 +34,6 @@ ValloxSerial::ValloxSerial()
 	m_FaultIndicator = INITIAL_VALUE;
 	m_ServiceReminderIndicator = INITIAL_VALUE;
 
-#ifndef MINIMUM_PROPERTIES
 	m_Humidity = INITIAL_VALUE;
 	m_BasicHumidityLevel = INITIAL_VALUE;
 
@@ -67,7 +66,6 @@ ValloxSerial::ValloxSerial()
 	m_MaxSpeedLimitMode = INITIAL_VALUE;
 
 	m_ServiceReminder = INITIAL_VALUE;
-#endif
 
 	m_InEfficiency = INITIAL_VALUE;
 	m_OutEfficiency = INITIAL_VALUE;
@@ -147,8 +145,6 @@ int8_t ValloxSerial::getValue(ValloxProperty propertyId) const
 		value = m_ServiceReminderIndicator;
 		break;
 
-#ifndef MINIMUM_PROPERTIES
-
 	case HumidityProperty:
 		value = m_Humidity;
 		break;
@@ -226,7 +222,34 @@ int8_t ValloxSerial::getValue(ValloxProperty propertyId) const
 	case ServiceReminderProperty:
 		value = m_ServiceReminder;
 		break;
-#endif
+
+	case PostHeatingOnProperty:
+		value = m_PostHeatingOn;
+		break;
+	case DamperMotorPositionProperty:
+		value = m_DamperMotorPosition;
+		break;
+	case FaultSignalRelayProperty:
+		value = m_FaultSignalRelay;
+		break;
+	case SupplyFanOffProperty:
+		value = m_SupplyFanOff;
+		break;
+	case PreHeatingOnProperty:
+		value = m_PreHeatingOn;
+		break;
+	case ExhaustFanOffProperty:
+		value = m_ExhaustFanOff;
+		break;
+	case FirePlaceBoosterOnProperty:
+		value = m_FirePlaceBoosterOn;
+		break;
+	case IncommingCurrentProperty:
+		value = m_IncommingCurrent;
+		break;
+	case LastErrorNumberProperty:
+		value = m_LastErrorNumber;
+		break;
 
 	default:
 		value = INITIAL_VALUE;
@@ -245,6 +268,7 @@ void ValloxSerial::detachPropertyChanged(PropertyChangedCallbackFunction callbac
 {
 	m_PropertyChangedCallback = NULL;
 }
+
 
 void ValloxSerial::attach(StartSendingFunction startSendingCallback, StopSendingFunction stopSendingCallback)
 {
@@ -269,6 +293,7 @@ void ValloxSerial::detachLogger(LogCallbackFunction callbackFunction)
 	m_LogCallback = NULL;
 }
 
+
 void ValloxSerial::attach(TelegramReceivedCallbackFunction callbackFunction)
 {
 	m_TelegramReceivedCallback = callbackFunction;
@@ -278,6 +303,7 @@ void ValloxSerial::detach(TelegramReceivedCallbackFunction callbackFunction)
 {
 	m_TelegramReceivedCallback = NULL;
 }
+
 
 void ValloxSerial::attach(TelegramChecksumFailureCallbackFunction callbackFunction)
 {
@@ -289,6 +315,7 @@ void ValloxSerial::detach(TelegramChecksumFailureCallbackFunction callbackFuncti
 	m_TelegramChecksumFailureCallback = NULL;
 }
 
+
 void ValloxSerial::attach(UnexpectedByteReceivedCallbackFunction callbackFunction)
 {
 	m_UnexpectedByteReceivedCallbackFunction = callbackFunction;
@@ -298,6 +325,7 @@ void ValloxSerial::detach(UnexpectedByteReceivedCallbackFunction callbackFunctio
 {
 	m_UnexpectedByteReceivedCallbackFunction = NULL;
 }
+
 
 void ValloxSerial::attach(SuspendResumeCallbackFunction callbackFunction)
 {
@@ -356,8 +384,6 @@ void ValloxSerial::poll(ValloxProperty propertyId) const
 	case ServiceReminderIndicatorProperty:
 		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_SELECT);
 		break;
-
-#ifndef MINIMUM_PROPERTIES
 
 	case HumidityProperty:
 		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_HUMIDITY);
@@ -439,7 +465,38 @@ void ValloxSerial::poll(ValloxProperty propertyId) const
 	case ServiceReminderProperty:
 		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_SERVICE_REMINDER);
 		break;
-#endif
+
+	// multi purpose io port 1
+	case PostHeatingOnProperty:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_1);
+		break;
+
+	// multi purpose io port 1
+	case DamperMotorPositionProperty:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2);
+		break;
+	case FaultSignalRelayProperty:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2);
+		break;
+	case SupplyFanOffProperty:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2);
+		break;
+	case PreHeatingOnProperty:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2);
+		break;
+	case ExhaustFanOffProperty:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2);
+		break;
+	case FirePlaceBoosterOnProperty:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2);
+		break;
+
+	case IncommingCurrentProperty:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_CURRENT_INCOMMING);
+		break;
+	case LastErrorNumberProperty:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_LAST_ERROR_NUMBER);
+		break;
 
 	// virtual properties for bit encoded values
 	case SelectStatusProperty:
@@ -451,6 +508,13 @@ void ValloxSerial::poll(ValloxProperty propertyId) const
 	case Program2Property:
 		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_PROGRAM2);
 		break;
+	case IoPortMultiPurpose1Property:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_1);
+		break;
+	case IoPortMultiPurpose2Property:
+		send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2);
+		break;
+
 	default:
 		// unknown property
 		break;
@@ -582,13 +646,12 @@ bool ValloxSerial::onTelegramReceived(uint8_t sender, uint8_t receiver, uint8_t 
 		}
 		case VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_1:
 		{
-			// convertIoPortMultiPurpose1
+			updateMultiPurposeIoPort1(value);
 			break;
 		}
 		case VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2:
 		{
-			// TODO
-			// convertIoPortMultiPurpose2
+			updateMultiPurposeIoPort2(value);
 			break;
 		}
 		case VALLOX_VARIABLE_INSTALLED_CO2_SENSORS:
@@ -599,12 +662,12 @@ bool ValloxSerial::onTelegramReceived(uint8_t sender, uint8_t receiver, uint8_t 
 		}
 		case VALLOX_VARIABLE_CURRENT_INCOMMING:
 		{
-			// TODO
+			updateCurrentIncomming(value);
 			break;
 		}
 		case VALLOX_VARIABLE_LAST_ERROR_NUMBER:
 		{
-			// TODO
+			updateLastErrorNumber(value);
 			break;
 		}
 		case VALLOX_VARIABLE_POST_HEATING_ON_COUNTER:
@@ -668,9 +731,6 @@ bool ValloxSerial::onTelegramReceived(uint8_t sender, uint8_t receiver, uint8_t 
 			// TODO
 			break;
 		}
-		
-
-
 		case VALLOX_VARIABLE_FAN_SPEED:
 		{
 			int fanSpeed = Vallox::convertFanSpeed(value);
@@ -707,7 +767,6 @@ bool ValloxSerial::onTelegramReceived(uint8_t sender, uint8_t receiver, uint8_t 
 			break;
 		}
 
-#ifndef MINIMUM_PROPERTIES
 		case VALLOX_VARIABLE_HUMIDITY:
 		{
 			updateHumidity(value);
@@ -839,7 +898,7 @@ bool ValloxSerial::onTelegramReceived(uint8_t sender, uint8_t receiver, uint8_t 
 			onSuspended(false);
 			break;
 		}
-#endif
+
 		default:
 		{
 			log("Unkown command received");
@@ -973,7 +1032,6 @@ void ValloxSerial::updateStatus(int8_t status)
 	}
 }
 
-#ifndef MINIMUM_PROPERTIES
 
 void ValloxSerial::updateHumidity(int8_t humidity)
 {
@@ -1196,8 +1254,91 @@ void ValloxSerial::updateServiceReminder(int8_t value)
 	}
 }
 
+void ValloxSerial::updateMultiPurposeIoPort1(int8_t value)
+{
+	bool postHeatingOn;
+	Vallox::convertIoPortMultiPurpose1(value,
+		&postHeatingOn);
 
-#endif
+	if (m_PostHeatingOn != postHeatingOn)
+	{
+		m_PostHeatingOn = postHeatingOn;
+		onPropertyChanged(PostHeatingOnProperty, m_PostHeatingOn);
+	}
+}
+
+void ValloxSerial::updateMultiPurposeIoPort2(int8_t value)
+{
+	bool damperMotorPosition;
+	bool faultSignalRelayClosed;
+	bool supplyFanOff;
+	bool preHeatingOn;
+	bool exhaustFanOff;
+	bool fireplaceBoosterClosed;
+
+	Vallox::convertIoPortMultiPurpose2(value,
+		&damperMotorPosition,
+		&faultSignalRelayClosed,
+		&supplyFanOff,
+		&preHeatingOn,
+		&exhaustFanOff,
+		&fireplaceBoosterClosed);
+
+	if (m_DamperMotorPosition != damperMotorPosition)
+	{
+		m_DamperMotorPosition = damperMotorPosition;
+		onPropertyChanged(DamperMotorPositionProperty, m_DamperMotorPosition);
+	}
+
+	if (m_FaultSignalRelay != faultSignalRelayClosed)
+	{
+		m_FaultSignalRelay = faultSignalRelayClosed;
+		onPropertyChanged(FaultSignalRelayProperty, m_FaultSignalRelay);
+	}
+
+	if (m_SupplyFanOff != supplyFanOff)
+	{
+		m_SupplyFanOff = supplyFanOff;
+		onPropertyChanged(SupplyFanOffProperty, m_SupplyFanOff);
+	}
+
+	if (m_PreHeatingOn != preHeatingOn)
+	{
+		m_PreHeatingOn = preHeatingOn;
+		onPropertyChanged(PreHeatingOnProperty, m_PreHeatingOn);
+	}
+
+	if (m_ExhaustFanOff != exhaustFanOff)
+	{
+		m_ExhaustFanOff = exhaustFanOff;
+		onPropertyChanged(ExhaustFanOffProperty, m_ExhaustFanOff);
+	}
+
+	if (m_FirePlaceBoosterOn != fireplaceBoosterClosed)
+	{
+		m_FirePlaceBoosterOn = fireplaceBoosterClosed;
+		onPropertyChanged(FirePlaceBoosterOnProperty, m_FirePlaceBoosterOn);
+	}
+}
+
+void ValloxSerial::updateCurrentIncomming(int8_t value)
+{
+	if (m_IncommingCurrent != value)
+	{
+		m_IncommingCurrent = value;
+		onPropertyChanged(IncommingCurrentProperty, m_IncommingCurrent);
+	}
+}
+
+void ValloxSerial::updateLastErrorNumber(int8_t value)
+{
+	if (m_LastErrorNumber != value)
+	{
+		m_LastErrorNumber = value;
+		onPropertyChanged(LastErrorNumberProperty, m_LastErrorNumber);
+	}
+}
+
 
 
 void ValloxSerial::updateEfficiencies()

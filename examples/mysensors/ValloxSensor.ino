@@ -1,8 +1,5 @@
-/* 
-Vallox MySensors sample sketch (see www.mysensors.org)
-Created by Karl-Heinz Wind - karl-heinz.wind@web.de
-Copyright 2015 License: GNU GPL v3 http://www.gnu.org/licenses/gpl-3.0.html
-
+/* (c) windkh 2015
+Vallox Sensor see www.mysensors.org
 hardware requirements
 - 1x Arduino Mega 
 - 1x Radio NRF24L01+
@@ -55,12 +52,14 @@ The Arduino Mega is used as it has several hardware serials which makes receivin
 
 //-------------------------------------------------------------------------------------------------
 // if you don't have any of those you do not need the sensor data (simply set em to false)
-#define OPTION_SELECT true		// bit encoded select variable
-#define OPTION_HUMIDITY false	// humidity sensor 1 & 2
-#define OPTION_CO2 false		// CO2 sensor
-#define OPTION_HEATER false		// heater & pre heater
-#define OPTION_PROGRAM false	// bit encoded program variable
-#define OPTION_PROGRAM2 false	// bit encoded program variable 2
+#define OPTION_SELECT true			// bit encoded select variable
+#define OPTION_HUMIDITY false		// humidity sensor 1 & 2
+#define OPTION_CO2 false			// CO2 sensor
+#define OPTION_HEATER false			// heater & pre heater
+#define OPTION_PROGRAM true	    	// bit encoded program variable
+#define OPTION_PROGRAM2 true		// bit encoded program variable 2
+#define OPTION_MULTIPURPOSE1 true	// bit encoded io port 1
+#define OPTION_MULTIPURPOSE2 true	// bit encoded io port 2
 
 //-------------------------------------------------------------------------------------------------
 // Note that AltSoftSerial uses RX=8 TX=9 PIN 10 is unsusable!
@@ -91,61 +90,76 @@ The Arduino Mega is used as it has several hardware serials which makes receivin
 
 //-------------------------------------------------------------------------------------------------
 // Child sensor ids
-const uint8_t FAN_SPEED					= 0;
-const uint8_t TEMP_INSIDE				= 1;
-const uint8_t TEMP_OUTSIDE				= 2;
-const uint8_t TEMP_EXHAUST				= 3;
-const uint8_t TEMP_INCOMMING			= 4;
+const uint8_t FAN_SPEED								= 0;
+const uint8_t TEMP_INSIDE							= 1;
+const uint8_t TEMP_OUTSIDE							= 2;
+const uint8_t TEMP_EXHAUST							= 3;
+const uint8_t TEMP_INCOMMING						= 4;
 
-const uint8_t EFFICIENCY_IN				= 5;
-const uint8_t EFFICIENCY_OUT			= 6;
-const uint8_t EFFICIENCY_AVERAGE		= 7;
+const uint8_t EFFICIENCY_IN							= 5;
+const uint8_t EFFICIENCY_OUT						= 6;
+const uint8_t EFFICIENCY_AVERAGE					= 7;
 
-const uint8_t POWER_STATE				= 8;
-const uint8_t CO2_ADJUST_STATE			= 9;
-const uint8_t HUMIDITY_ADJUST_STATE		= 10;
-const uint8_t HEATING_STATE				= 11;
-const uint8_t FILTER_GUARD_INDICATOR	= 12;
-const uint8_t HEATING_INDICATOR			= 13;
-const uint8_t FAULT_INDICATOR			= 14;
-const uint8_t SERVICE_REMINDER_INDICATOR= 15;
+const uint8_t POWER_STATE							= 8;
+const uint8_t CO2_ADJUST_STATE						= 9;
+const uint8_t HUMIDITY_ADJUST_STATE					= 10;
+const uint8_t HEATING_STATE							= 11;
+const uint8_t FILTER_GUARD_INDICATOR				= 12;
+const uint8_t HEATING_INDICATOR						= 13;
+const uint8_t FAULT_INDICATOR						= 14;
+const uint8_t SERVICE_REMINDER_INDICATOR			= 15;
 
-const uint8_t HUMIDITY					= 16;
-const uint8_t BASIC_HUMIDITY_LEVEL		= 17;
-const uint8_t HUMIDITY_SENSOR_1			= 18;
-const uint8_t HUMIDITY_SENSOR_2			= 19;
+const uint8_t HUMIDITY								= 16;
+const uint8_t BASIC_HUMIDITY_LEVEL					= 17;
+const uint8_t HUMIDITY_SENSOR_1						= 18;
+const uint8_t HUMIDITY_SENSOR_2						= 19;
 
-const uint8_t CO2_HIGH					= 20;
-const uint8_t CO2_LOW					= 21;
-const uint8_t CO2_SET_POINT_HIGH		= 22;
-const uint8_t CO2_SET_POINT_LOW			= 23;
+const uint8_t CO2_HIGH								= 20;
+const uint8_t CO2_LOW								= 21;
+const uint8_t CO2_SET_POINT_HIGH					= 22;
+const uint8_t CO2_SET_POINT_LOW						= 23;
 
-const uint8_t FAN_SPEED_MAX				= 24;
-const uint8_t FAN_SPEED_MIN				= 25;
-const uint8_t DC_FAN_INPUT_ADJUSTMENT	= 26;
-const uint8_t DC_FAN_OUTPUT_ADJUSTMENT  = 27;
-const uint8_t INPUT_FAN_STOP_THRESHOLD  = 28;
+const uint8_t FAN_SPEED_MAX							= 24;
+const uint8_t FAN_SPEED_MIN							= 25;
+const uint8_t DC_FAN_INPUT_ADJUSTMENT				= 26;
+const uint8_t DC_FAN_OUTPUT_ADJUSTMENT				= 27;
+const uint8_t INPUT_FAN_STOP_THRESHOLD				= 28;
 
-const uint8_t HEATING_SET_POINT			= 29;
-const uint8_t PRE_HEATING_SET_POINT		= 30;
-const uint8_t HRC_BYPASS_THRESHOLD		= 31;
-const uint8_t CELL_DEFROSTING_THRESHOLD = 32;
+const uint8_t HEATING_SET_POINT						= 29;
+const uint8_t PRE_HEATING_SET_POINT					= 30;
+const uint8_t HRC_BYPASS_THRESHOLD					= 31;
+const uint8_t CELL_DEFROSTING_THRESHOLD				= 32;
 
 // program
-const uint8_t ADJUSTMENT_INTERVAL_MINUTES = 33;
+const uint8_t ADJUSTMENT_INTERVAL_MINUTES			= 33;
 const uint8_t AUTOMATIC_HUMIDITY_LEVEL_SEEKER_STATE = 34;
-const uint8_t BOOST_SWITCH_MODE			= 35;
-const uint8_t RADIATOR_TYPE				= 36;
-const uint8_t CASCADE_ADJUST			= 37;
+const uint8_t BOOST_SWITCH_MODE						= 35;
+const uint8_t RADIATOR_TYPE							= 36;
+const uint8_t CASCADE_ADJUST						= 37;
 
 // program2
-const uint8_t MAX_SPEED_LIMIT_MODE		= 38;
+const uint8_t MAX_SPEED_LIMIT_MODE					= 38;
 
-const uint8_t SERVICE_REMINDER			= 39;
+const uint8_t SERVICE_REMINDER						= 39;
 
 //-------------------------------------------------------------------------------------------------
-const uint8_t BOOST_SWITCH				= 40;
+const uint8_t BOOST_SWITCH							= 40;
 
+//-------------------------------------------------------------------------------------------------
+// multi purpose 1
+const uint8_t POST_HEATING_ON						= 41;
+
+// multi purpose 2
+const uint8_t DAMPER_MOTOR_POSITION					= 42;
+const uint8_t FAULT_SIGNAL_RELAY					= 43;
+const uint8_t SUPPLY_FAN_OFF						= 44;
+const uint8_t PRE_HEATING_ON						= 45;
+const uint8_t EXHAUST_FAN_OFF						= 46;
+const uint8_t FIRE_PLACE_BOOSTER_ON					= 47;
+
+const uint8_t INCOMMING_CURRENT						= 48;
+
+const uint8_t LAST_ERROR_NUMBER						= 49;
 //-------------------------------------------------------------------------------------------------
 
 struct ChildSensor
@@ -160,6 +174,7 @@ struct ChildSensor
 //-------------------------------------------------------------------------------------------------
 static ChildSensor CHILD_SENSORS[] =
 {
+	//active, child id, type, value type, name
 	{ true, FAN_SPEED, S_DIMMER, V_DIMMER, "Fan speed" },
 	{ true, TEMP_INSIDE, S_TEMP, V_TEMP, "Temp inside" },
 	{ true, TEMP_OUTSIDE, S_TEMP, V_TEMP, "Temp outside" },
@@ -209,10 +224,26 @@ static ChildSensor CHILD_SENSORS[] =
 	// program2
 	{ OPTION_PROGRAM2, MAX_SPEED_LIMIT_MODE, S_CUSTOM, V_VAR1, "Max speed limit mode" },
 	
-	{ false, SERVICE_REMINDER, S_CUSTOM, V_VAR1, "Service reminder" },
+	{ true, SERVICE_REMINDER, S_CUSTOM, V_VAR1, "Service reminder" },
 
-	// additional non vallox features
+	// non vallox feature: boost switch with caller supplied minutes
 	{ true, BOOST_SWITCH, S_DIMMER, V_DIMMER, "Boost switch minutes" },
+
+
+	// multi purpose 1
+	{ OPTION_MULTIPURPOSE1, POST_HEATING_ON, S_CUSTOM, V_VAR1, "Post heating on" },
+
+	// multi purpose 2
+	{ OPTION_MULTIPURPOSE2, DAMPER_MOTOR_POSITION, S_CUSTOM, V_VAR1, "Post heating on" },
+	{ OPTION_MULTIPURPOSE2, FAULT_SIGNAL_RELAY, S_CUSTOM, V_VAR1, "Fault signal relay" },
+	{ OPTION_MULTIPURPOSE2, SUPPLY_FAN_OFF, S_CUSTOM, V_VAR1, "Supply fan off" },
+	{ OPTION_MULTIPURPOSE2, PRE_HEATING_ON, S_CUSTOM, V_VAR1, "Pre heating on" },
+	{ OPTION_MULTIPURPOSE2, EXHAUST_FAN_OFF, S_CUSTOM, V_VAR1, "Exhaust fan off" },
+	{ OPTION_MULTIPURPOSE2, FIRE_PLACE_BOOSTER_ON, S_CUSTOM, V_VAR1, "Fire place booster on" },
+
+	{ true, INCOMMING_CURRENT, S_CUSTOM, V_VAR1, "Incomming current" },
+
+	{ true, LAST_ERROR_NUMBER, S_CUSTOM, V_VAR1, "Last error number" },
 };
 static uint8_t CHILD_SENSORS_COUNT = sizeof(CHILD_SENSORS) / sizeof(ChildSensor);
 
@@ -275,7 +306,23 @@ static ValloxProperty PROPERTIES_TO_OBSERVE[] =
 	Program2Property,
 	////MaxSpeedLimitModeProperty,
 	
-	ServiceReminderProperty
+	ServiceReminderProperty,
+
+	// ioport multi purpose 1
+	IoPortMultiPurpose1Property,
+	////PostHeatingOnProperty,
+
+	// ioport multi purpose 2
+	IoPortMultiPurpose2Property,
+	////DamperMotorPositionProperty,
+	////FaultSignalRelayProperty,
+	////SupplyFanOffProperty,
+	////PreHeatingOnProperty,
+	////ExhaustFanOffProperty,
+	////FirePlaceBoosterOnProperty,
+
+	IncommingCurrentProperty,
+	LastErrorNumberProperty
 };
 static uint8_t PROPERTIES_TO_OBSERVE_COUNT = sizeof(PROPERTIES_TO_OBSERVE) / sizeof(ValloxProperty);
 
@@ -634,6 +681,51 @@ void onPropertyChanged(ValloxProperty propertyId, int8_t value)
 		sendMessage(SERVICE_REMINDER, value);
 		break;
 	}
+	case PostHeatingOnProperty:
+	{
+		sendMessage(POST_HEATING_ON, value);
+		break;
+	}
+	case DamperMotorPositionProperty:
+	{
+		sendMessage(DAMPER_MOTOR_POSITION, value);
+		break;
+	}	
+	case FaultSignalRelayProperty:
+	{
+		sendMessage(FAULT_SIGNAL_RELAY, value);
+		break;
+	}
+	case SupplyFanOffProperty:
+	{
+		sendMessage(SUPPLY_FAN_OFF, value);
+		break;
+	}
+	case PreHeatingOnProperty:
+	{
+		sendMessage(PRE_HEATING_ON, value);
+		break;
+	}
+	case ExhaustFanOffProperty:
+	{
+		sendMessage(EXHAUST_FAN_OFF, value);
+		break;
+	}
+	case FirePlaceBoosterOnProperty:
+	{
+		sendMessage(FIRE_PLACE_BOOSTER_ON, value);
+		break;
+	}
+	case IncommingCurrentProperty:
+	{
+		sendMessage(INCOMMING_CURRENT, value);
+		break;
+	}
+	case LastErrorNumberProperty:
+	{
+		sendMessage(LAST_ERROR_NUMBER, value);
+		break;
+	}
 
 	default:
 #ifdef PRINT_RECEIVED_PROPERTIES
@@ -959,5 +1051,3 @@ void loop()
 
 	updateBoostTime();
 }
-
-

@@ -155,7 +155,7 @@ const uint8_t VALLOX_VARIABLE_FLAGS_1 = 0x6C;
 // | | | | | | | +- 0 CO2 higher speed-request 0=no 1=Speed​​. up
 // | | | | | | +--- 1 CO2 lower rate public invitation 0=no 1=Speed​​. down
 // | | | | | +----- 2 %RH lower rate public invitation 0=no 1=Speed​​. down
-// | | | | +------- 3 switch low. Spd.-request 0=no 1=Speed ​. down
+// | | | | +------- 3 switch low. Spd.-request 0=no 1=Speed​. down
 // | | | +--------- 4 
 // | | +----------- 5 
 // | +------------- 6 CO2 alarm 0=no 1=CO2 alarm
@@ -205,7 +205,7 @@ const uint8_t VALLOX_VARIABLE_FLAGS_5 = 0x70;
 // | | | | | +----- 2 
 // | | | | +------- 3 
 // | | | +--------- 4 remote monitoring control 0=no 1=Operation - readonly
-// | | +----------- 5 Activation of the fireplace switch read the variable and set this number one
+// | | +----------- 5 Activation of the fireplace switch read the variable and set this number one <-- bit can be set to activate fire place switch
 // | +------------- 6 fireplace/booster status 0=off 1=on - read only
 // +--------------- 7
 const uint8_t VALLOX_VARIABLE_FLAGS_6 = 0x71;
@@ -517,9 +517,9 @@ public:
 	// | +------------- 6 
 	// +--------------- 7 
 	static void convertIoPortMultiPurpose1(uint8_t value,
-		bool* pPreHeatingOn)
+		bool* pPostHeatingOn)
 	{
-		*pPreHeatingOn = (value & 0x20) != 0;
+		*pPostHeatingOn = (value & 0x20) != 0;
 	}
 
 	// 1 1 1 1 1 1 1 1  0=0ff 1=on
@@ -535,21 +535,21 @@ public:
 	static void convertIoPortMultiPurpose2(uint8_t value,
 		//bool* pUnknown1,
 		bool* pDamperMotorPosition,
-		bool* pFaultSignalRelay,
-		bool* pSupplyFan,
-		bool* pPreHeating,
-		bool* pExhaustFan,
-		bool* pFireplaceBooster
+		bool* pFaultSignalRelayClosed,
+		bool* pSupplyFanOff,
+		bool* pPreHeatingOn,
+		bool* pExhaustFanOff,
+		bool* pFireplaceBoosterClosed
 		//bool* pUnknown2
 		)
 	{
 		//*pUnknown1 = (value & 0x01) != 0;
 		*pDamperMotorPosition = (value & 0x02) != 0;
-		*pFaultSignalRelay = (value & 0x04) != 0;
-		*pSupplyFan = (value & 0x08) != 0;
-		*pPreHeating = (value & 0x10) != 0;
-		*pExhaustFan = (value & 0x20) != 0;
-		*pFireplaceBooster = (value & 0x40) != 0;
+		*pFaultSignalRelayClosed = (value & 0x04) != 0;
+		*pSupplyFanOff = (value & 0x08) != 0;
+		*pPreHeatingOn = (value & 0x10) != 0;
+		*pExhaustFanOff = (value & 0x20) != 0;
+		*pFireplaceBoosterClosed = (value & 0x40) != 0;
 		//*pUnknown2 = (value & 0x80) != 0;
 	}
 

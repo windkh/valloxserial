@@ -12,59 +12,85 @@ extern "C" {
 	enum ValloxProperty
 	{
 		// sensor data 
-		FanSpeedProperty				= 0,
-		TempInsideProperty				= 1,
-		TempOutsideProperty				= 2,
-		TempExhaustProperty				= 3,
-		TempIncommingProperty			= 4,
+		FanSpeedProperty							= 0,  // VALLOX_VARIABLE_FAN_SPEED
+		TempInsideProperty							= 1,  // VALLOX_VARIABLE_TEMP_INSIDE
+		TempOutsideProperty							= 2,  // VALLOX_VARIABLE_TEMP_OUTSIDE
+		TempExhaustProperty							= 3,  // VALLOX_VARIABLE_TEMP_EXHAUST
+		TempIncommingProperty						= 4,  // VALLOX_VARIABLE_TEMP_INCOMMING
 
 		// status bits
-		PowerStateProperty				= 5,
-		CO2AdjustStateProperty			= 6,
-		HumidityAdjustStateProperty		= 7,
-		HeatingStateProperty			= 8,
-		FilterGuardIndicatorProperty	= 9,
-		HeatingIndicatorProperty		= 10,
-		FaultIndicatorProperty			= 11,
-		ServiceReminderIndicatorProperty= 12,
+		PowerStateProperty							= 5,  // VALLOX_VARIABLE_SELECT
+		CO2AdjustStateProperty						= 6,  // VALLOX_VARIABLE_SELECT
+		HumidityAdjustStateProperty					= 7,  // VALLOX_VARIABLE_SELECT
+		HeatingStateProperty						= 8,  // VALLOX_VARIABLE_SELECT
+		FilterGuardIndicatorProperty				= 9,  // VALLOX_VARIABLE_SELECT
+		HeatingIndicatorProperty					= 10, // VALLOX_VARIABLE_SELECT
+		FaultIndicatorProperty						= 11, // VALLOX_VARIABLE_SELECT
+		ServiceReminderIndicatorProperty			= 12, // VALLOX_VARIABLE_SELECT
 
-#ifndef MINIMUM_PROPERTIES
+		HumidityProperty							= 13, // VALLOX_VARIABLE_HUMIDITY
+		BasicHumidityLevelProperty					= 14, // VALLOX_VARIABLE_BASIC_HUMIDITY_LEVEL
+		HumiditySensor1Property						= 15, // VALLOX_VARIABLE_HUMIDITY_SENSOR1
+		HumiditySensor2Property						= 16, // VALLOX_VARIABLE_HUMIDITY_SENSOR2
 
-		HumidityProperty				= 13,
-		BasicHumidityLevelProperty		= 14,
-		HumiditySensor1Property			= 15,
-		HumiditySensor2Property			= 16,
+		CO2HighProperty								= 17, // VALLOX_VARIABLE_CO2_HIGH
+		CO2LowProperty								= 18, // VALLOX_VARIABLE_CO2_LOW
+		CO2SetPointHighProperty						= 19, // VALLOX_VARIABLE_CO2_SET_POINT_UPPER
+		CO2SetPointLowProperty						= 20, // VALLOX_VARIABLE_CO2_SET_POINT_LOWER
 
-		CO2HighProperty					= 17,
-		CO2LowProperty					= 18,
-		CO2SetPointHighProperty			= 19,
-		CO2SetPointLowProperty			= 20,
+		FanSpeedMaxProperty							= 21, // VALLOX_VARIABLE_FAN_SPEED_MAX
+		FanSpeedMinProperty							= 22, // VALLOX_VARIABLE_FAN_SPEED_MIN
+		DCFanInputAdjustmentProperty				= 23, // VALLOX_VARIABLE_DC_FAN_INPUT_ADJUSTMENT
+		DCFanOutputAdjustmentProperty				= 24, // VALLOX_VARIABLE_DC_FAN_OUTPUT_ADJUSTMENT
+		InputFanStopThresholdProperty				= 25, // VALLOX_VARIABLE_INPUT_FAN_STOP
 
-		FanSpeedMaxProperty				= 21,
-		FanSpeedMinProperty				= 22,
-		DCFanInputAdjustmentProperty	= 23,
-		DCFanOutputAdjustmentProperty	= 24,
-		InputFanStopThresholdProperty	= 25,
-
-		HeatingSetPointProperty			= 26,
-		PreHeatingSetPointProperty		= 27,
-		HrcBypassThresholdProperty		= 28,
-		CellDefrostingThresholdProperty	= 29,
+		HeatingSetPointProperty						= 26, // VALLOX_VARIABLE_HEATING_SET_POINT
+		PreHeatingSetPointProperty					= 27, // VALLOX_VARIABLE_PRE_HEATING_SET_POINT
+		HrcBypassThresholdProperty					= 28, // VALLOX_VARIABLE_HRC_BYPASS
+		CellDefrostingThresholdProperty				= 29, // VALLOX_VARIABLE_CELL_DEFROSTING
 
 		// program
-		AdjustmentIntervalMinutesProperty= 30,
-		AutomaticHumidityLevelSeekerStateProperty= 31,
-		BoostSwitchModeProperty			= 32,
-		RadiatorTypeProperty			= 33,
-		CascadeAdjustProperty			= 34,
+		AdjustmentIntervalMinutesProperty			= 30, // VALLOX_VARIABLE_PROGRAM
+		AutomaticHumidityLevelSeekerStateProperty	= 31, // VALLOX_VARIABLE_PROGRAM
+		BoostSwitchModeProperty						= 32, // VALLOX_VARIABLE_PROGRAM
+		RadiatorTypeProperty						= 33, // VALLOX_VARIABLE_PROGRAM
+		CascadeAdjustProperty						= 34, // VALLOX_VARIABLE_PROGRAM
 
 		// program2
-		MaxSpeedLimitModeProperty		= 35,
+		MaxSpeedLimitModeProperty					= 35, // VALLOX_VARIABLE_PROGRAM2
 
-		ServiceReminderProperty			= 36,
+		ServiceReminderProperty						= 36, // VALLOX_VARIABLE_SERVICE_REMINDER
 
-		
-#endif
+		// ioport multi purpose 1
+		PostHeatingOnProperty						= 37, // VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_1
+
+		// ioport multi purpose 2
+		DamperMotorPositionProperty					= 38, // VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2
+		FaultSignalRelayProperty					= 39, // VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2
+		SupplyFanOffProperty						= 50, // VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2
+		PreHeatingOnProperty						= 41, // VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2
+		ExhaustFanOffProperty						= 42, // VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2
+		FirePlaceBoosterOnProperty					= 43, // VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2
+
+		IncommingCurrentProperty					= 44, // VALLOX_VARIABLE_CURRENT_INCOMMING
+		LastErrorNumberProperty                     = 45, // VALLOX_VARIABLE_LAST_ERROR_NUMBER
+
+
+		// TODO: thos variables are to be implemented in future
+		//VALLOX_VARIABLE_IOPORT_FANSPEED_RELAYS
+		//VALLOX_VARIABLE_INSTALLED_CO2_SENSORS
+		//VALLOX_VARIABLE_POST_HEATING_ON_COUNTER
+		//VALLOX_VARIABLE_POST_HEATING_OFF_TIME
+		//VALLOX_VARIABLE_POST_HEATING_TARGET_VALUE
+		//VALLOX_VARIABLE_FLAGS_1
+		//VALLOX_VARIABLE_FLAGS_2
+		//VALLOX_VARIABLE_FLAGS_3
+		//VALLOX_VARIABLE_FLAGS_4
+		//VALLOX_VARIABLE_FLAGS_5
+		//VALLOX_VARIABLE_FLAGS_6
+		//VALLOX_VARIABLE_FIRE_PLACE_BOOSTER_COUNTER
+		//VALLOX_VARIABLE_MAINTENANCE_MONTH_COUNTER
+
 		// calculated  properties
 		InEfficiencyProperty			= 100,
 		OutEfficiencyProperty			= 101,
@@ -77,8 +103,10 @@ extern "C" {
 
 		// virtual properties to be able to poll for this variable
 		SelectStatusProperty			= 200,
-		ProgramProperty					= 201,
-		Program2Property				= 202
+		ProgramProperty					= 201, // VALLOX_VARIABLE_PROGRAM
+		Program2Property				= 202, // VALLOX_VARIABLE_PROGRAM2
+		IoPortMultiPurpose1Property		= 203, // VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_1
+		IoPortMultiPurpose2Property		= 204, // VALLOX_VARIABLE_IOPORT_MULTI_PURPOSE_2
 	};
 
 	// callback function types
@@ -149,7 +177,6 @@ private:
 
 	inline void  updateStatus(int8_t status);
 
-#ifndef MINIMUM_PROPERTIES
 	inline void updateHumidity(int8_t humidity);
 	inline void updateBasicHumidityLevel(int8_t value);
 	inline void updateHumiditySensor1(int8_t value);
@@ -175,9 +202,15 @@ private:
 	inline void updateProgram2(int8_t program);
 
 	inline void updateServiceReminder(int8_t value);
-#endif
+
+	inline void updateMultiPurposeIoPort1(int8_t value);
+	inline void updateMultiPurposeIoPort2(int8_t value);
+	inline void updateCurrentIncomming(int8_t value);
+	inline void updateLastErrorNumber(int8_t value);
 
 	inline void updateEfficiencies();
+
+	
 
 	inline void log(const char* message) const;
 	inline void onSuspended(bool suspended);
@@ -214,7 +247,6 @@ private:
 	int8_t m_FaultIndicator;
 	int8_t m_ServiceReminderIndicator;
 
-#ifndef MINIMUM_PROPERTIES
 	int8_t m_Humidity;
 	int8_t m_BasicHumidityLevel;
 
@@ -248,9 +280,21 @@ private:
 
 	int8_t m_ServiceReminder;
 
-	bool m_TxSuspended;
+	// multi porpose ioport 1
+	int8_t m_PostHeatingOn;
 
-#endif
+	// multi porpose ioport 2
+	int8_t m_DamperMotorPosition;
+	int8_t m_FaultSignalRelay;
+	int8_t m_SupplyFanOff;
+	int8_t m_PreHeatingOn;
+	int8_t m_ExhaustFanOff;
+	int8_t m_FirePlaceBoosterOn;
+
+	int8_t m_IncommingCurrent;
+	int8_t m_LastErrorNumber;
+
+	bool m_TxSuspended;
 
 	// calculated properties
 	int8_t m_InEfficiency;
