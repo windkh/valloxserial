@@ -60,15 +60,30 @@ The Arduino Mega is used as it has several hardware serials which makes receivin
 #define OPTION_PROGRAM2 true		// bit encoded program variable 2
 #define OPTION_MULTIPURPOSE1 true	// bit encoded io port 1
 #define OPTION_MULTIPURPOSE2 true	// bit encoded io port 2
+#define OPTION_USE_TIMER true		// sends the cached values every 3 minutes
+
+
+
+
+
 
 //-------------------------------------------------------------------------------------------------
+#ifdef OPTION_USE_TIMER
+#include "Timer.h"
+Timer timer;
+#define TEMP_UPDATE_INTERVAL 3*60000
+#endif
+
+//-------------------------------------------------------------------------------------------------
+
+
 // Note that AltSoftSerial uses RX=8 TX=9 PIN 10 is unsusable!
-#define CE_PIN			 3 // orange 
-#define CS_PIN           4 // yellow
+#define CE_PIN 3 // orange 
+#define CS_PIN 4 // yellow
 
 #define SERIAL_TX_CONTROL_PIN 5   //RS485 Direction control
-#define RS485_TX    HIGH
-#define RS485_RX    LOW
+#define RS485_TX HIGH
+#define RS485_RX LOW
 
 // boost switch button
 #define BOOST_BUTTON_PIN 6
@@ -82,8 +97,8 @@ The Arduino Mega is used as it has several hardware serials which makes receivin
 #define RETRY_DELAY_MS 500 
 
 // Diagnostic LED
-#define BLINK_LED_PIN   13
-#define BLINK_TIME		10
+#define BLINK_LED_PIN 13
+#define BLINK_TIME 10
 
 #define SERIAL_BAUDRATE 115200
 
@@ -341,6 +356,17 @@ bool boostModeActive = false;
 unsigned long boostEndMillis = 0;
 uint8_t boostRemainingMinutes = 0;
 
+// cached values
+int8_t lastFanSpeedValue;
+int8_t lastTempInsideValue;
+int8_t lastTempOutsideValue;
+int8_t lastTempExhaustValue;
+int8_t lastTempIncommingValue;
+
+int8_t lastInEfficiencyValue;
+int8_t lastOutEfficiencyValue;
+int8_t lastAverageEfficiencyValue;
+
 //-------------------------------------------------------------------------------------------------
 // Note that AltSoftSerial uses RX=8 TX=9 PIN 10 is unsusable!
 //#define SSerialRX        5 // 10  //Serial Receive pin
@@ -372,7 +398,7 @@ void setupSerials(Stream** ppRxStream, Stream** ppTxStream)
 void setupSensor()
 {
 	gw.begin(incomingMessage, AUTO, true);
-	gw.sendSketchInfo("Vallox Digit SE", "1.1");
+	gw.sendSketchInfo("Vallox Digit SE", "2.0");
 
 	for (uint8_t i = 0; i < CHILD_SENSORS_COUNT; i++)
 	{
@@ -479,48 +505,59 @@ void onPropertyChanged(ValloxProperty propertyId, int8_t value)
 {
 	switch (propertyId)
 	{
+		// cached values
 	case FanSpeedProperty:
 	{
 		sendMessage(FAN_SPEED, value);
+		lastFanSpeedValue = value;
 		break;
 	}
 	case TempInsideProperty:
 	{
 		sendMessage(TEMP_INSIDE, value);
+		lastTempInsideValue = value;
 		break;
 	}
 	case TempOutsideProperty:
 	{
 		sendMessage(TEMP_OUTSIDE, value);
+		lastTempOutsideValue = value;
 		break;
 	}
 	case TempExhaustProperty:
 	{
 		sendMessage(TEMP_EXHAUST, value);
+		lastTempExhaustValue = value;
 		break;
 	}
 	case TempIncommingProperty:
 	{
 		sendMessage(TEMP_INCOMMING, value);
+		lastTempIncommingValue = value;
 		break;
 	}
 
 	case InEfficiencyProperty:
 	{
 		sendMessage(EFFICIENCY_IN, value);
+		lastInEfficiencyValue = value;
 		break;
 	}
 	case OutEfficiencyProperty:
 	{
 		sendMessage(EFFICIENCY_OUT, value);
+		lastOutEfficiencyValue = value;
 		break;
 	}
 	case AverageEfficiencyProperty:
 	{
 		sendMessage(EFFICIENCY_AVERAGE, value);
+		lastAverageEfficiencyValue = value;
 		break;
 	}
 
+
+	// non cahced values
 	case PowerStateProperty:
 	{
 		sendMessage(POWER_STATE, value);
@@ -971,7 +1008,28 @@ void setup()
 	setupSensor();
 	setupVallox(pRxStream, pTxStream);
 	setupBoostButton();
+
+#ifdef OPTION_USE_TIMER
+	/*int tickEvent1 = */timer.every(TEMP_UPDATE_INTERVAL, sendValuesTimerHandler);
+	Serial.println("Started cyclic update timer.");
+#endif
 }
+
+#ifdef OPTION_USE_TIMER
+void sendValuesTimerHandler()
+{
+	Serial.println("Sending cached values:");
+	sendMessage(FAN_SPEED, lastFanSpeedValue);
+	sendMessage(TEMP_INSIDE, lastTempInsideValue);
+	sendMessage(TEMP_OUTSIDE, lastTempOutsideValue);
+	sendMessage(TEMP_EXHAUST, lastTempExhaustValue);
+	sendMessage(TEMP_INCOMMING, lastTempIncommingValue);
+
+	sendMessage(EFFICIENCY_IN, lastInEfficiencyValue);
+	sendMessage(EFFICIENCY_OUT, lastOutEfficiencyValue);
+	sendMessage(EFFICIENCY_AVERAGE, lastAverageEfficiencyValue);
+}
+#endif
 
 //-------------------------------------------------------------------------------------------------
 void loop()
@@ -1050,4 +1108,8 @@ void loop()
 	}
 
 	updateBoostTime();
+
+#ifdef OPTION_USE_TIMER
+	timer.update();
+#endif
 }

@@ -66,6 +66,20 @@ ValloxSerial::ValloxSerial()
 	m_MaxSpeedLimitMode = INITIAL_VALUE;
 
 	m_ServiceReminder = INITIAL_VALUE;
+	
+	// multi porpose ioport 1
+	m_PostHeatingOn = INITIAL_VALUE;
+
+	// multi porpose ioport 2
+	m_DamperMotorPosition = INITIAL_VALUE;
+	m_FaultSignalRelay = INITIAL_VALUE;
+	m_SupplyFanOff = INITIAL_VALUE;
+	m_PreHeatingOn = INITIAL_VALUE;
+	m_ExhaustFanOff = INITIAL_VALUE;
+	m_FirePlaceBoosterOn = INITIAL_VALUE;
+
+	m_IncommingCurrent = INITIAL_VALUE;
+	m_LastErrorNumber = INITIAL_VALUE;
 
 	m_InEfficiency = INITIAL_VALUE;
 	m_OutEfficiency = INITIAL_VALUE;
