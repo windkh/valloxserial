@@ -55,7 +55,7 @@ The Arduino Mega is used as it has several hardware serials which makes receivin
 #define OPTION_SELECT true			// bit encoded select variable
 #define OPTION_HUMIDITY false		// humidity sensor 1 & 2
 #define OPTION_CO2 false			// CO2 sensor
-#define OPTION_HEATER false			// heater & pre heater
+#define OPTION_HEATER true			// heater & pre heater
 #define OPTION_PROGRAM true	    	// bit encoded program variable
 #define OPTION_PROGRAM2 true		// bit encoded program variable 2
 #define OPTION_MULTIPURPOSE1 true	// bit encoded io port 1
@@ -139,7 +139,6 @@ const uint8_t FAN_SPEED_MIN							= 25;
 const uint8_t DC_FAN_INPUT_ADJUSTMENT				= 26;
 const uint8_t DC_FAN_OUTPUT_ADJUSTMENT				= 27;
 const uint8_t INPUT_FAN_STOP_THRESHOLD				= 28;
-
 const uint8_t HEATING_SET_POINT						= 29;
 const uint8_t PRE_HEATING_SET_POINT					= 30;
 const uint8_t HRC_BYPASS_THRESHOLD					= 31;
@@ -219,15 +218,15 @@ static ChildSensor CHILD_SENSORS[] =
 	{ OPTION_CO2, CO2_SET_POINT_HIGH, S_CUSTOM, V_VAR1, "CO2 set point high" },
 	{ OPTION_CO2, CO2_SET_POINT_LOW, S_CUSTOM, V_VAR1, "CO2 set point low" },
 
-	{ true, FAN_SPEED_MAX, S_CUSTOM, V_VAR1, "Fan speed max" },
-	{ true, FAN_SPEED_MIN, S_CUSTOM, V_VAR1, "Fan speed min" },
+	{ true, FAN_SPEED_MAX, S_DIMMER, V_DIMMER, "Fan speed max" },
+	{ true, FAN_SPEED_MIN, S_DIMMER, V_DIMMER, "Fan speed min" },
 	{ true, DC_FAN_INPUT_ADJUSTMENT, S_DIMMER, V_DIMMER, "DC fan input adjustment" },
 	{ true, DC_FAN_OUTPUT_ADJUSTMENT, S_DIMMER, V_DIMMER, "DC fan output adjustment" },
-	{ true, INPUT_FAN_STOP_THRESHOLD, S_TEMP, V_TEMP, "Input fan stop threshold" },
-	{ OPTION_HEATER, HEATING_SET_POINT, S_TEMP, V_TEMP, "Heating setpoint" },
-	{ OPTION_HEATER, PRE_HEATING_SET_POINT, S_TEMP, V_TEMP, "Pre heating setpoint" },
-	{ false, HRC_BYPASS_THRESHOLD, S_TEMP, V_TEMP, "HRC bypass threshold" },
-	{ OPTION_HEATER, CELL_DEFROSTING_THRESHOLD, S_TEMP, V_TEMP, "Cell defrosting threshold" },
+	{ true, INPUT_FAN_STOP_THRESHOLD, S_DIMMER, V_DIMMER, "Input fan stop threshold" },
+	{ OPTION_HEATER, HEATING_SET_POINT, S_DIMMER, V_DIMMER, "Heating setpoint" },
+	{ OPTION_HEATER, PRE_HEATING_SET_POINT, S_DIMMER, V_DIMMER, "Pre heating setpoint" },
+	{ true, HRC_BYPASS_THRESHOLD, S_DIMMER, V_DIMMER, "HRC bypass threshold" },
+	{ OPTION_HEATER, CELL_DEFROSTING_THRESHOLD, S_DIMMER, V_DIMMER, "Cell defrosting threshold" },
 
 	// program
 	{ OPTION_PROGRAM, ADJUSTMENT_INTERVAL_MINUTES, S_CUSTOM, V_VAR1, "Adjustment interval minutes" },
@@ -267,7 +266,7 @@ static uint8_t CHILD_SENSORS_COUNT = sizeof(CHILD_SENSORS) / sizeof(ChildSensor)
 // here you can select which variables are polled
 static ValloxProperty PROPERTIES_TO_OBSERVE[] =
 {
-	// those are broadcasted cyclically
+	// those are broadcasted periodically
 	//FanSpeedProperty,
 	//TempInsideProperty,
 	//TempOutsideProperty,
@@ -303,11 +302,10 @@ static ValloxProperty PROPERTIES_TO_OBSERVE[] =
 	DCFanOutputAdjustmentProperty,
 	InputFanStopThresholdProperty,
 
-	// we do not have a heater
-	//HeatingSetPointProperty,
-	//PreHeatingSetPointProperty,
+	HeatingSetPointProperty,
+	PreHeatingSetPointProperty,
 	HrcBypassThresholdProperty,
-	//CellDefrostingThresholdProperty,
+	CellDefrostingThresholdProperty,
 
 	// program
 	ProgramProperty,
@@ -398,7 +396,7 @@ void setupSerials(Stream** ppRxStream, Stream** ppTxStream)
 void setupSensor()
 {
 	gw.begin(incomingMessage, AUTO, true);
-	gw.sendSketchInfo("Vallox Digit SE", "2.0");
+	gw.sendSketchInfo("Vallox Digit SE", "2.1");
 
 	for (uint8_t i = 0; i < CHILD_SENSORS_COUNT; i++)
 	{
@@ -885,6 +883,87 @@ void incomingMessage(const MyMessage &message)
 
 		valloxSerial.setDCFanOutputAdjustment(requestedLevel);
 	}
+
+	if (message.sensor == INPUT_FAN_STOP_THRESHOLD && message.type == V_DIMMER)
+	{
+		int requestedLevel = atoi(message.data);
+
+#ifdef 	PRINT_TX_PROPERTIES
+		int8_t currentLevel = valloxSerial.getValue(InputFanStopThresholdProperty);
+
+		Serial.print("Changing input fan stop temperature setpoint from ");
+		Serial.print(currentLevel);
+		Serial.print(", to ");
+		Serial.println(requestedLevel);
+#endif
+
+		valloxSerial.setInputFanStopThreshold(requestedLevel);
+	}
+
+	if (message.sensor == HEATING_SET_POINT && message.type == V_DIMMER)
+	{
+		int requestedLevel = atoi(message.data);
+
+#ifdef 	PRINT_TX_PROPERTIES
+		int8_t currentLevel = valloxSerial.getValue(HeatingSetPointProperty);
+
+		Serial.print("Changing heating temperature setpoint from ");
+		Serial.print(currentLevel);
+		Serial.print(", to ");
+		Serial.println(requestedLevel);
+#endif
+
+		valloxSerial.setHeatingSetPoint(requestedLevel);
+	}
+	
+	if (message.sensor == PRE_HEATING_SET_POINT && message.type == V_DIMMER)
+	{
+		int requestedLevel = atoi(message.data);
+
+#ifdef 	PRINT_TX_PROPERTIES
+		int8_t currentLevel = valloxSerial.getValue(PreHeatingSetPointProperty);
+
+		Serial.print("Changing preheating temperature setpoint from ");
+		Serial.print(currentLevel);
+		Serial.print(", to ");
+		Serial.println(requestedLevel);
+#endif
+
+		valloxSerial.setPreHeatingSetPoint(requestedLevel);
+	}
+	
+	if (message.sensor == CELL_DEFROSTING_THRESHOLD && message.type == V_DIMMER)
+	{
+		int requestedLevel = atoi(message.data);
+
+#ifdef 	PRINT_TX_PROPERTIES
+		int8_t currentLevel = valloxSerial.getValue(CellDefrostingThresholdProperty);
+
+		Serial.print("Changing cell defrosting temperature setpoint from ");
+		Serial.print(currentLevel);
+		Serial.print(", to ");
+		Serial.println(requestedLevel);
+#endif
+
+		valloxSerial.setCellDefrostingThreshold(requestedLevel);
+	}
+	
+	if (message.sensor == HRC_BYPASS_THRESHOLD && message.type == V_DIMMER)
+	{
+		int requestedLevel = atoi(message.data);
+
+#ifdef 	PRINT_TX_PROPERTIES
+		int8_t currentLevel = valloxSerial.getValue(HrcBypassThresholdProperty);
+
+		Serial.print("Changing HRC bypass temperature setpoint from ");
+		Serial.print(currentLevel);
+		Serial.print(", to ");
+		Serial.println(requestedLevel);
+#endif
+
+		valloxSerial.setHrcBypassThreshold(requestedLevel);
+	}
+
 
 	if (message.sensor == BOOST_SWITCH && message.type == V_DIMMER)
 	{

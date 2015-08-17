@@ -535,6 +535,8 @@ void ValloxSerial::poll(ValloxProperty propertyId) const
 	}
 }
 
+
+
 void ValloxSerial::setFanSpeed(uint8_t value) const
 {
 	uint8_t fanSpeed = Vallox::convertBackFanSpeed(value-1); // -1 as index in array is zero based 0-7
@@ -561,6 +563,36 @@ void ValloxSerial::setDCFanInputAdjustment(uint8_t value) const
 void ValloxSerial::setDCFanOutputAdjustment(uint8_t value) const
 {
 	send(VALLOX_VARIABLE_DC_FAN_OUTPUT_ADJUSTMENT, value);
+}
+
+void ValloxSerial::setHrcBypassThreshold(int8_t value) const
+{
+	uint8_t temperature = Vallox::convertBackTemperature(value);
+	send(VALLOX_VARIABLE_HRC_BYPASS, temperature);
+}
+
+void ValloxSerial::setInputFanStopThreshold(int8_t value) const
+{
+	uint8_t temperature = Vallox::convertBackTemperature(value);
+	send(VALLOX_VARIABLE_INPUT_FAN_STOP, temperature);
+}
+
+void ValloxSerial::setHeatingSetPoint(int8_t value) const
+{
+	uint8_t temperature = Vallox::convertBackTemperature(value);
+	send(VALLOX_VARIABLE_HEATING_SET_POINT, temperature);
+}
+
+void ValloxSerial::setPreHeatingSetPoint(int8_t value) const
+{
+	uint8_t temperature = Vallox::convertBackTemperature(value);
+	send(VALLOX_VARIABLE_PRE_HEATING_SET_POINT, temperature);
+}
+
+void ValloxSerial::setCellDefrostingThreshold(int8_t value) const
+{
+	uint8_t temperature = Vallox::convertBackTemperature(value);
+	send(VALLOX_VARIABLE_CELL_DEFROSTING, temperature);
 }
 
 void ValloxSerial::send(uint8_t variable, uint8_t value) const

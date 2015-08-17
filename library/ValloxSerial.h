@@ -43,7 +43,6 @@ extern "C" {
 		DCFanInputAdjustmentProperty				= 23, // VALLOX_VARIABLE_DC_FAN_INPUT_ADJUSTMENT
 		DCFanOutputAdjustmentProperty				= 24, // VALLOX_VARIABLE_DC_FAN_OUTPUT_ADJUSTMENT
 		InputFanStopThresholdProperty				= 25, // VALLOX_VARIABLE_INPUT_FAN_STOP
-
 		HeatingSetPointProperty						= 26, // VALLOX_VARIABLE_HEATING_SET_POINT
 		PreHeatingSetPointProperty					= 27, // VALLOX_VARIABLE_PRE_HEATING_SET_POINT
 		HrcBypassThresholdProperty					= 28, // VALLOX_VARIABLE_HRC_BYPASS
@@ -139,6 +138,12 @@ public:
 	void setFanSpeedMax(uint8_t value) const;	// actor: control fan speed 1-8 max
 	void setDCFanInputAdjustment(uint8_t value) const;	// actor: control DC input fan adjustment
 	void setDCFanOutputAdjustment(uint8_t value) const;	// actor: control DC output fan adjustment
+	
+	void setHrcBypassThreshold(int8_t value) const;	// actor: control HRC bypass threshold
+	void setInputFanStopThreshold(int8_t value) const;	// actor: control input fan stop threshold
+	void setHeatingSetPoint(int8_t value) const;	// actor: control heating set point
+	void setPreHeatingSetPoint(int8_t value) const;	// actor: control pre heating set point
+	void setCellDefrostingThreshold(int8_t value) const;	// actor: control cell defrosting threshold (hysteresis 4)
 
 	bool receive();								// this one has to be called in the loop() function.
 	void calculateResults();					// this one calculates all efficiency property calculations
@@ -280,10 +285,10 @@ private:
 
 	int8_t m_ServiceReminder;
 
-	// multi porpose ioport 1
+	// multi purpose ioport 1
 	int8_t m_PostHeatingOn;
 
-	// multi porpose ioport 2
+	// multi purpose ioport 2
 	int8_t m_DamperMotorPosition;
 	int8_t m_FaultSignalRelay;
 	int8_t m_SupplyFanOff;

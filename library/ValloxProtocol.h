@@ -274,7 +274,7 @@ const uint8_t VALLOX_VARIABLE_BASIC_HUMIDITY_LEVEL = 0xAE;
 const uint8_t VALLOX_VARIABLE_HRC_BYPASS = 0xAF; // Heat recovery cell bypass setpoint temp 
 const uint8_t VALLOX_VARIABLE_DC_FAN_INPUT_ADJUSTMENT = 0xB0; // 0-100%
 const uint8_t VALLOX_VARIABLE_DC_FAN_OUTPUT_ADJUSTMENT = 0xB1; // 0-100%
-const uint8_t VALLOX_VARIABLE_CELL_DEFROSTING = 0xB2; // Defrosting starts when exhaust air drops below this setpoint temp 
+const uint8_t VALLOX_VARIABLE_CELL_DEFROSTING = 0xB2; // Defrosting starts when exhaust air drops below this setpoint temp (Hysteresis 4)
 const uint8_t VALLOX_VARIABLE_CO2_SET_POINT_UPPER = 0xB3;
 const uint8_t VALLOX_VARIABLE_CO2_SET_POINT_LOWER = 0xB4;
 
@@ -366,9 +366,26 @@ static int8_t VALLOX_TEMPERATURE_MAPPING[] =
 class Vallox
 {
 public:
-	static uint8_t convertTemperature(uint8_t value)
+	static int8_t convertTemperature(uint8_t value)
 	{
 		return VALLOX_TEMPERATURE_MAPPING[value];
+	}
+
+	static uint8_t convertBackTemperature(int8_t temperature)
+	{
+		uint8_t value = 100;
+
+		for (uint8_t i = 0; i < 255; i++)
+		{
+			int8_t valueFromTable = VALLOX_TEMPERATURE_MAPPING[i];
+			if (valueFromTable >= temperature)
+			{
+				value = i;
+				break;
+			}
+		}
+
+		return value;
 	}
 
 	// 8 --> 0xFF
