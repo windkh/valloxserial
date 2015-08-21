@@ -25,6 +25,7 @@ ValloxSerial::ValloxSerial()
 	m_TempExhaust = INITIAL_VALUE;
 	m_TempIncomming = INITIAL_VALUE;
 
+	m_SelectStatus = INITIAL_VALUE;
 	m_PowerState = INITIAL_VALUE;
 	m_CO2AdjustState = INITIAL_VALUE;
 	m_HumidityAdjustState = INITIAL_VALUE;
@@ -132,6 +133,10 @@ int8_t ValloxSerial::getValue(ValloxProperty propertyId) const
 		break;
 	case TempIncommingProperty:
 		value = m_TempIncomming;
+		break;
+
+	case SelectStatusProperty:
+		value = m_SelectStatus;
 		break;
 
 	case PowerStateProperty:
@@ -595,7 +600,14 @@ void ValloxSerial::setCellDefrostingThreshold(int8_t value) const
 	send(VALLOX_VARIABLE_CELL_DEFROSTING, temperature);
 }
 
-void ValloxSerial::send(uint8_t variable, uint8_t value) const
+void ValloxSerial::setSelectStatus(int8_t value) const
+{
+	send(VALLOX_VARIABLE_SELECT, value);
+	//send(VALLOX_VARIABLE_SELECT, value, VALLOX_ADDRESS_MAINBOARDS);
+	send(VALLOX_VARIABLE_POLL, VALLOX_VARIABLE_SELECT);
+}
+
+void ValloxSerial::send(uint8_t variable, uint8_t value, uint8_t destination) const
 {
 	// When C02 sensor communication is active we discard telegrams
 	if (!m_TxSuspended)
@@ -603,7 +615,7 @@ void ValloxSerial::send(uint8_t variable, uint8_t value) const
 		uint8_t telegram[VALLOX_LENGTH];
 		telegram[0] = VALLOX_DOMAIN;
 		telegram[1] = m_SenderId;
-		telegram[2] = VALLOX_ADDRESS_MASTER;
+		telegram[2] = destination;
 		telegram[3] = variable;
 		telegram[4] = value;
 		telegram[5] = Vallox::calculateChecksum(telegram);
@@ -809,7 +821,7 @@ bool ValloxSerial::onTelegramReceived(uint8_t sender, uint8_t receiver, uint8_t 
 		}
 		case VALLOX_VARIABLE_SELECT:
 		{
-			updateStatus(value);
+			updateSelectStatus(value);
 			break;
 		}
 
@@ -1008,8 +1020,14 @@ void ValloxSerial::updateTempIncomming(int8_t temperature)
 	}
 }
 
-void ValloxSerial::updateStatus(int8_t status)
+void ValloxSerial::updateSelectStatus(int8_t select)
 {
+	if (m_SelectStatus != select)
+	{
+		m_SelectStatus = select;
+		onPropertyChanged(SelectStatusProperty, m_SelectStatus);
+	}
+
 	bool powerState;
 	bool co2AdjustState;
 	bool humidityAdjustState;
@@ -1019,7 +1037,7 @@ void ValloxSerial::updateStatus(int8_t status)
 	bool faultIndicator;
 	bool serviceReminderIndicator;
 
-	Vallox::convertSelect(status,
+	Vallox::convertSelect(select,
 		&powerState, 
 		&co2AdjustState, 
 		&humidityAdjustState, 

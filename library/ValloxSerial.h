@@ -75,7 +75,7 @@ extern "C" {
 		LastErrorNumberProperty                     = 45, // VALLOX_VARIABLE_LAST_ERROR_NUMBER
 
 
-		// TODO: thos variables are to be implemented in future
+		// TODO: those variables are to be implemented in future
 		//VALLOX_VARIABLE_IOPORT_FANSPEED_RELAYS
 		//VALLOX_VARIABLE_INSTALLED_CO2_SENSORS
 		//VALLOX_VARIABLE_POST_HEATING_ON_COUNTER
@@ -95,10 +95,6 @@ extern "C" {
 		OutEfficiencyProperty			= 101,
 		AverageEfficiencyProperty		= 102,
 		
-		// TODO
-		// Volumenstrom
-		// Wärmeübertragung
-		// Wärmegewinn
 
 		// virtual properties to be able to poll for this variable
 		SelectStatusProperty			= 200,
@@ -144,6 +140,7 @@ public:
 	void setHeatingSetPoint(int8_t value) const;	// actor: control heating set point
 	void setPreHeatingSetPoint(int8_t value) const;	// actor: control pre heating set point
 	void setCellDefrostingThreshold(int8_t value) const;	// actor: control cell defrosting threshold (hysteresis 4)
+	void setSelectStatus(int8_t value) const; // actor: set the lower 4 bits of the select status bits.
 
 	bool receive();								// this one has to be called in the loop() function.
 	void calculateResults();					// this one calculates all efficiency property calculations
@@ -172,7 +169,7 @@ public:
 	void detach(SuspendResumeCallbackFunction callbackFunction);
 
 private:
-	void send(uint8_t variable, uint8_t value) const;
+	void send(uint8_t variable, uint8_t value, uint8_t destination = VALLOX_ADDRESS_MASTER) const;
 
 	inline void updateFanSpeed(int8_t fanSpeed);
 	inline void updateTempInside(int8_t temperature);
@@ -180,7 +177,7 @@ private:
 	inline void updateTempExhaust(int8_t temperature);
 	inline void updateTempIncomming(int8_t temperature);
 
-	inline void  updateStatus(int8_t status);
+	inline void  updateSelectStatus(int8_t select);
 
 	inline void updateHumidity(int8_t humidity);
 	inline void updateBasicHumidityLevel(int8_t value);
@@ -241,6 +238,9 @@ private:
 	int8_t m_TempOutside;
 	int8_t m_TempExhaust;
 	int8_t m_TempIncomming;
+
+	// status
+	int8_t m_SelectStatus;
 
 	// status bits
 	int8_t m_PowerState;

@@ -37,6 +37,10 @@ The Arduino Mega is used as it has several hardware serials which makes receivin
 //#include <AltSoftSerial.h>
 #include <ValloxSerial.h>
 
+#define SET_BIT(value, place)		(value | (1 << place))
+#define CLEAR_BIT(value, place)		(value & (~(1 << place)))
+#define TOGGLE_BIT(value, place)		(value ^ (1 << place))
+
 //-------------------------------------------------------------------------------------------------
 // uncomment this if you only have one MAX485 for sending and receiving (not recommended)
 //#define SINGLE_SERIAL_MODE // only one RS485 chip is used for rx and tx
@@ -61,9 +65,6 @@ The Arduino Mega is used as it has several hardware serials which makes receivin
 #define OPTION_MULTIPURPOSE1 true	// bit encoded io port 1
 #define OPTION_MULTIPURPOSE2 true	// bit encoded io port 2
 #define OPTION_USE_TIMER true		// sends the cached values every 3 minutes
-
-
-
 
 
 
@@ -200,10 +201,11 @@ static ChildSensor CHILD_SENSORS[] =
 	{ true, EFFICIENCY_AVERAGE, S_CUSTOM, V_VAR1, "Efficiency average" },
 
 	// select
-	{ OPTION_SELECT, POWER_STATE, S_CUSTOM, V_VAR1, "Power state" },
-	{ OPTION_SELECT, CO2_ADJUST_STATE, S_CUSTOM, V_VAR1, "CO2 adjust state" },
-	{ OPTION_SELECT, HUMIDITY_ADJUST_STATE, S_CUSTOM, V_VAR1, "Humidity adjust state" },
-	{ OPTION_SELECT, HEATING_STATE, S_CUSTOM, V_VAR1, "Heating state" },
+	{ OPTION_SELECT, POWER_STATE, S_LIGHT, V_LIGHT, "Power state" },
+	{ OPTION_SELECT, CO2_ADJUST_STATE, S_LIGHT, V_LIGHT, "CO2 adjust state" },
+	{ OPTION_SELECT, HUMIDITY_ADJUST_STATE, S_LIGHT, V_LIGHT, "Humidity adjust state" },
+	{ OPTION_SELECT, HEATING_STATE, S_LIGHT, V_LIGHT, "Heating state" },
+
 	{ OPTION_SELECT, FILTER_GUARD_INDICATOR, S_CUSTOM, V_VAR1, "Filter guard indicator" },
 	{ OPTION_SELECT, HEATING_INDICATOR, S_CUSTOM, V_VAR1, "Heating indicator" },
 	{ OPTION_SELECT, FAULT_INDICATOR, S_CUSTOM, V_VAR1, "Fault indicator" },
@@ -396,7 +398,7 @@ void setupSerials(Stream** ppRxStream, Stream** ppTxStream)
 void setupSensor()
 {
 	gw.begin(incomingMessage, AUTO, true);
-	gw.sendSketchInfo("Vallox Digit SE", "2.1");
+	gw.sendSketchInfo("Vallox Digit SE", "2.4");
 
 	for (uint8_t i = 0; i < CHILD_SENSORS_COUNT; i++)
 	{
@@ -962,6 +964,111 @@ void incomingMessage(const MyMessage &message)
 #endif
 
 		valloxSerial.setHrcBypassThreshold(requestedLevel);
+	}
+
+	if (message.sensor == POWER_STATE && message.type == V_LIGHT)
+	{
+		int8_t select = valloxSerial.getValue(SelectStatusProperty);
+
+		if (message.getBool())
+		{
+			select = SET_BIT(select, 0);
+#ifdef 	PRINT_TX_PROPERTIES
+			Serial.print("Power on (select = ");
+			Serial.print(select);
+			Serial.println(")");
+#endif
+		}
+		else
+		{
+			select = CLEAR_BIT(select, 0);
+#ifdef 	PRINT_TX_PROPERTIES
+			Serial.print("Power off (select = ");
+			Serial.print(select);
+			Serial.println(")");
+#endif
+		}
+
+		valloxSerial.setSelectStatus(select);
+	}
+
+	if (message.sensor == CO2_ADJUST_STATE && message.type == V_LIGHT)
+	{
+		int8_t select = valloxSerial.getValue(SelectStatusProperty);
+
+		if (message.getBool())
+		{
+			select = SET_BIT(select, 1);
+#ifdef 	PRINT_TX_PROPERTIES
+			Serial.print("CO2 adjust on (select = ");
+			Serial.print(select);
+			Serial.println(")");
+#endif
+		}
+		else
+		{
+			select = CLEAR_BIT(select, 1);
+#ifdef 	PRINT_TX_PROPERTIES
+			Serial.print("CO2 adjust off (select = ");
+			Serial.print(select);
+			Serial.println(")");
+#endif
+		}
+
+		valloxSerial.setSelectStatus(select);
+	}
+
+	if (message.sensor == HUMIDITY_ADJUST_STATE && message.type == V_LIGHT)
+	{
+		int8_t select = valloxSerial.getValue(SelectStatusProperty);
+
+		if (message.getBool())
+		{
+			select = SET_BIT(select, 2);
+#ifdef 	PRINT_TX_PROPERTIES
+			Serial.print("Humidity adjust on (select = ");
+			Serial.print(select);
+			Serial.println(")");
+#endif
+		}
+		else
+		{
+			select = CLEAR_BIT(select, 2);
+#ifdef 	PRINT_TX_PROPERTIES
+			Serial.print("Humidity adjust off (select = ");
+			Serial.print(select);
+			Serial.println(")");
+#endif
+		}
+
+		valloxSerial.setSelectStatus(select);
+	}
+
+
+	if (message.sensor == HEATING_STATE && message.type == V_LIGHT)
+	{
+		int8_t select = valloxSerial.getValue(SelectStatusProperty);
+
+		if (message.getBool())
+		{
+			select = SET_BIT(select, 3);
+#ifdef 	PRINT_TX_PROPERTIES
+			Serial.print("Heating state on (select = ");
+			Serial.print(select);
+			Serial.println(")");
+#endif
+		}
+		else
+		{
+			select = CLEAR_BIT(select, 3);
+#ifdef 	PRINT_TX_PROPERTIES
+			Serial.print("Heating state off (select = ");
+			Serial.print(select);
+			Serial.println(")");
+#endif
+		}
+
+		valloxSerial.setSelectStatus(select);
 	}
 
 
