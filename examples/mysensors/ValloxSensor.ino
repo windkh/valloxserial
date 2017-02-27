@@ -1,4 +1,6 @@
-/* (c) windkh 2015
+/* (c) windkh 2016
+MySensors 2.0
+
 Vallox Sensor see www.mysensors.org
 hardware requirements
 - 1x Arduino Mega 
@@ -27,11 +29,31 @@ MAX485 VCC 5V
 MAX485 RX DE/RE (RS485 direction control) connected to GND
 
 The Arduino Mega is used as it has several hardware serials which makes receiving telegrams more robust.
+
+Download the following lib to be able to use the programmable button 
+https://github.com/pkourany/clickButton
 */
 
-#include <MySensor.h> 
+#define MY_DEBUG_VERBOSE
+#define MY_SPECIAL_DEBUG
+
+// Enable debug prints to serial monitor
+#define MY_DEBUG 
+
+// Enable and select radio type attached
+#define MY_RADIO_NRF24
+
+// Enabled repeater feature for this node
+#define MY_REPEATER_FEATURE
+
+// Note that AltSoftSerial uses RX=8 TX=9 PIN 10 is unsusable!
+#define MY_RF24_CE_PIN 3 // orange 
+#define MY_RF24_CS_PIN 4 // yellow
+
+
+#include <MySensors.h> 
 #include <SPI.h>
-#include <EEPROM.h>  
+//#include <EEPROM.h>  
 #include "ClickButton.h"
 
 //#include <AltSoftSerial.h>
@@ -76,11 +98,6 @@ Timer timer;
 #endif
 
 //-------------------------------------------------------------------------------------------------
-
-
-// Note that AltSoftSerial uses RX=8 TX=9 PIN 10 is unsusable!
-#define CE_PIN 3 // orange 
-#define CS_PIN 4 // yellow
 
 #define SERIAL_TX_CONTROL_PIN 5   //RS485 Direction control
 #define RS485_TX HIGH
@@ -348,7 +365,7 @@ static unsigned long OBSERVE_PROPERTIES_INTERVAL_MS = 5000;
 uint8_t nextVariableToPollIndex = 0;
 unsigned long lastPollMillis = 0;
 
-MySensor gw(CE_PIN, CS_PIN);
+
 ValloxSerial valloxSerial;
 
 ClickButton BoostButton(BOOST_BUTTON_PIN, LOW, CLICKBTN_PULLUP);
@@ -397,15 +414,14 @@ void setupSerials(Stream** ppRxStream, Stream** ppTxStream)
 //-------------------------------------------------------------------------------------------------
 void setupSensor()
 {
-	gw.begin(incomingMessage, AUTO, true);
-	gw.sendSketchInfo("Vallox Digit SE", "2.4");
+	sendSketchInfo("Vallox Digit SE", "2.5");
 
 	for (uint8_t i = 0; i < CHILD_SENSORS_COUNT; i++)
 	{
 		ChildSensor& childSensor = CHILD_SENSORS[i];
 		if (childSensor.active)
 		{
-			gw.present(childSensor.childSensorId, childSensor.variableTypeId);
+			present(childSensor.childSensorId, childSensor.variableTypeId);
 		}
 	}
 }
@@ -799,12 +815,12 @@ inline void sendMessage(uint8_t childSensorId, int8_t value)
 		uint8_t variableType = childSensor.valueTypeId;
 		MyMessage message(childSensorId, variableType);
 		message.set(value);
-		gw.send(message);
+		send(message);
 	}
 }
 
 //-------------------------------------------------------------------------------------------------
-void incomingMessage(const MyMessage &message)
+void receive(const MyMessage &message)
 {
 	if (message.sensor == FAN_SPEED && message.type == V_DIMMER)
 	{
@@ -1176,7 +1192,7 @@ void blink(int duration)
 
 
 //-------------------------------------------------------------------------------------------------
-void setup()
+void presentation()
 {
 	Stream* pTxStream = NULL;
 	Stream* pRxStream = NULL;
@@ -1220,9 +1236,6 @@ void sendValuesTimerHandler()
 //-------------------------------------------------------------------------------------------------
 void loop()
 {
-	// MySensors update
-	gw.process();
-
 	// Vallox RS485 RX
 	if (valloxSerial.receive())
 	{
